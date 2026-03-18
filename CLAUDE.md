@@ -49,6 +49,24 @@ Shared code that crosses feature boundaries stays in `src/`:
 - `src/lib/` — shared constants and utilities
 - `src/store/` — global Zustand stores
 
+## Dashboard Layout
+
+The dashboard shell lives in `src/app/(dashboard)/` (Next.js route group):
+- `layout.tsx` — `SidebarProvider` + `TooltipProvider` + `AppSidebar` + `SidebarInset` (topbar + main content)
+- `page.tsx` — role-based dashboard home (reads role from auth store, renders `DashboardContent`)
+- `_components/` — dashboard-specific components (KPI cards, charts, recent activity, content assembly)
+
+Shared chrome components in `src/components/`:
+- `app-sidebar.tsx` — sidebar reading `user.role` from auth store, uses `navConfig` from `src/lib/navigation.ts`
+- `app-topbar.tsx` — sticky header with `SidebarTrigger`, page title (from `pathTitles` map), notification bell
+- `nav-main.tsx` — renders nav items as `SidebarMenuButton` with `render={<Link />}` (Base UI pattern)
+- `nav-user.tsx` — user avatar + logout dropdown in sidebar footer; uses `DropdownMenuTrigger render={<SidebarMenuButton />}`
+- `kpi-card.tsx` — KPI stat card with left border accent, icon, value, and trend indicator
+
+Navigation config: `src/lib/navigation.ts` exports `navConfig: Record<UserRole, NavItem[]>` and `pathTitles` map. Types in `src/types/navigation.ts`.
+
+**shadcn/ui note:** This project uses the `base-maia` style backed by **Base UI** primitives, not Radix. Use `render={<element />}` prop instead of `asChild`. Icon library is **hugeicons** (`@hugeicons/react`) for shadcn components, but `lucide-react` is used in custom components.
+
 ## Auth
 
 - `src/types/auth.ts` — `User`, `UserRole`, `LoginCredentials` types

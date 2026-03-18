@@ -1,3 +1,33 @@
 {
-  "items": []
+  "items": [],
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@fpc.org.pe",
+      "password": "admin123",
+      "name": "Admin FPC",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "email": "callcenter@fpc.org.pe",
+      "password": "callcenter123",
+      "name": "Agente Call Center",
+      "role": "callcenter"
+    },
+    {
+      "id": 3,
+      "email": "voluntario@fpc.org.pe",
+      "password": "voluntario123",
+      "name": "Voluntario FPC",
+      "role": "voluntario"
+    },
+    {
+      "id": 4,
+      "email": "fundacion@fpc.org.pe",
+      "password": "fundacion123",
+      "name": "Coordinador Fundación",
+      "role": "fundacion"
+    }
+  ]
 }

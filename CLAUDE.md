@@ -32,3 +32,31 @@ pnpm format       # Prettier (auto-fixes in place)
 **Styling** — Tailwind CSS v4 (PostCSS plugin, no `tailwind.config.js`). Theme tokens are CSS variables defined in `src/app/globals.css` under `:root` / `.dark`. shadcn uses the `base-nova` preset with neutral base color.
 
 **Path alias** — `@/*` maps to `src/*`.
+
+## Feature architecture (screaming architecture)
+
+Feature-specific code lives co-located with its route using `_`-prefixed dirs (Next.js private folders, not routable):
+
+```
+src/app/login/
+  page.tsx
+  _components/login-form.tsx
+  _hooks/use-login.ts
+```
+
+Shared code that crosses feature boundaries stays in `src/`:
+- `src/types/` — shared TypeScript types
+- `src/lib/` — shared constants and utilities
+- `src/store/` — global Zustand stores
+
+## Auth
+
+- `src/types/auth.ts` — `User`, `UserRole`, `LoginCredentials` types
+- `src/lib/auth.ts` — `AUTH_COOKIE_NAME`, `PUBLIC_ROUTES`, `API_URL` constants
+- `src/store/auth-store.ts` — Zustand store with cookie `persist` adapter; exposes `login(user)` / `logout()`
+- `src/app/login/_hooks/use-login.ts` — TanStack Query `useMutation` that queries json-server `/users?email&password`, then calls `store.login`
+- `src/proxy.ts` — Next.js 16 route protection (replaces `middleware.ts`); exports named `proxy(request)` + `config.matcher`; redirects unauthenticated requests to `/login` and authenticated users away from `/login`
+
+## Code Style
+
+When creating UI for this project always try to use shadcn components using the best practices, only utilize custom components when necessary.

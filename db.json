@@ -29,5 +29,13 @@
       "name": "Coordinador Fundación",
       "role": "fundacion"
     }
-  ]
+  ],
+  "patients": [],
+  "clinicalCases": [],
+  "psychooncologyServices": [],
+  "sessions": [],
+  "volunteers": [],
+  "educationalTalks": [],
+  "talkRegistrations": [],
+  "enrollmentAuditLog": []
 }

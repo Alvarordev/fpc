@@ -44,13 +44,9 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarSeparator />
-
       <SidebarContent>
         <NavMain groups={groups} />
       </SidebarContent>
-
-      <SidebarSeparator />
 
       <SidebarFooter>
         {user && <NavUser user={user} />}

@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation"
 import { Bell } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { pathTitles } from "@/lib/navigation"
 
@@ -15,7 +14,6 @@ export function AppTopbar() {
   return (
     <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b border-border/60 bg-background/95 backdrop-blur-sm px-4">
       <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-foreground" />
-      <Separator orientation="vertical" className="mr-1 h-4" />
       <span className="text-sm font-medium">{title}</span>
       <div className="ml-auto flex items-center gap-1">
         <Button

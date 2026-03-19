@@ -7,10 +7,13 @@ import { PatientsToolbar } from "./patients-toolbar"
 import { PatientsTable } from "./patients-table"
 import { patientColumns } from "../_utils/patient-columns"
 import { patients, type PatientStatus } from "../_utils/patient-data"
+import { useRouter } from "next/navigation"
 
 export function PatientsContent() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<PatientStatus | null>(null)
+  const router = useRouter()
+
 
   const filtered = patients.filter((p) => {
     const fullName = `${p.nombre} ${p.apellido}`.toLowerCase()
@@ -25,6 +28,7 @@ export function PatientsContent() {
     return matchesSearch && matchesStatus
   })
 
+
   return (
     <div className="space-y-5 max-w-7xl">
       <div className="flex items-start justify-between gap-4">
@@ -34,7 +38,7 @@ export function PatientsContent() {
             {patients.length} pacientes registrados
           </p>
         </div>
-        <Button size="sm" className="gap-1.5 shrink-0">
+        <Button size="sm" className="gap-1.5 shrink-0" onClick={() => router.push("/inscripcion")}>
           <UserPlus className="size-4" />
           Nuevo paciente
         </Button>

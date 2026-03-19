@@ -11,40 +11,100 @@ import {
   FileText,
   Settings2,
 } from "lucide-react"
-import type { NavItem } from "@/types/navigation"
+import type { NavGroup } from "@/types/navigation"
 import type { UserRole } from "@/types/auth"
 
-export const navConfig: Record<UserRole, NavItem[]> = {
+export const navConfig: Record<UserRole, NavGroup[]> = {
   callcenter: [
-    { title: "Dashboard", url: "/", icon: LayoutDashboard },
-    { title: "Pacientes", url: "/pacientes", icon: Users },
-    { title: "Inscripción", url: "/inscripcion", icon: ClipboardList, highlight: true },
-    { title: "Llamadas", url: "/llamadas", icon: Phone },
-    { title: "Citas", url: "/citas", icon: Calendar },
-    { title: "Mis Métricas", url: "/metricas", icon: BarChart3 },
+    {
+      label: "Gestión",
+      items: [
+        { title: "Dashboard", url: "/", icon: LayoutDashboard },
+        { title: "Pacientes", url: "/pacientes", icon: Users },
+        { title: "Inscripción", url: "/inscripcion", icon: ClipboardList, highlight: true },
+      ],
+    },
+    {
+      label: "Seguimiento",
+      items: [
+        { title: "Llamadas", url: "/llamadas", icon: Phone },
+        { title: "Citas", url: "/citas", icon: Calendar },
+      ],
+    },
+    {
+      label: "Análisis",
+      items: [
+        { title: "Mis Métricas", url: "/metricas", icon: BarChart3 },
+      ],
+    },
   ],
   voluntario: [
-    { title: "Dashboard", url: "/", icon: LayoutDashboard },
-    { title: "Mi Agenda", url: "/agenda", icon: CalendarDays },
-    { title: "Mis Pacientes", url: "/pacientes", icon: Users },
-    { title: "Disponibilidad", url: "/disponibilidad", icon: Clock },
-    { title: "Reportes", url: "/reportes", icon: FileText },
+    {
+      label: "Gestión",
+      items: [
+        { title: "Dashboard", url: "/", icon: LayoutDashboard },
+        { title: "Mi Agenda", url: "/agenda", icon: CalendarDays },
+      ],
+    },
+    {
+      label: "Pacientes",
+      items: [
+        { title: "Mis Pacientes", url: "/pacientes", icon: Users },
+        { title: "Disponibilidad", url: "/disponibilidad", icon: Clock },
+      ],
+    },
+    {
+      label: "Análisis",
+      items: [
+        { title: "Reportes", url: "/reportes", icon: FileText },
+      ],
+    },
   ],
   fundacion: [
-    { title: "Dashboard", url: "/", icon: LayoutDashboard },
-    { title: "Pacientes", url: "/pacientes", icon: Users },
-    { title: "Voluntarios", url: "/voluntarios", icon: UserCheck },
-    { title: "Citas", url: "/citas", icon: Calendar },
-    { title: "Reportes", url: "/reportes", icon: FileText },
-    { title: "Configuración", url: "/configuracion", icon: Settings2 },
+    {
+      label: "Gestión",
+      items: [
+        { title: "Dashboard", url: "/", icon: LayoutDashboard },
+        { title: "Pacientes", url: "/pacientes", icon: Users },
+        { title: "Voluntarios", url: "/voluntarios", icon: UserCheck },
+      ],
+    },
+    {
+      label: "Operaciones",
+      items: [
+        { title: "Citas", url: "/citas", icon: Calendar },
+      ],
+    },
+    {
+      label: "Análisis",
+      items: [
+        { title: "Reportes", url: "/reportes", icon: FileText },
+        { title: "Configuración", url: "/configuracion", icon: Settings2 },
+      ],
+    },
   ],
   admin: [
-    { title: "Dashboard", url: "/", icon: LayoutDashboard },
-    { title: "Pacientes", url: "/pacientes", icon: Users },
-    { title: "Voluntarios", url: "/voluntarios", icon: UserCheck },
-    { title: "Citas", url: "/citas", icon: Calendar },
-    { title: "Reportes", url: "/reportes", icon: FileText },
-    { title: "Configuración", url: "/configuracion", icon: Settings2 },
+    {
+      label: "Gestión",
+      items: [
+        { title: "Dashboard", url: "/", icon: LayoutDashboard },
+        { title: "Pacientes", url: "/pacientes", icon: Users },
+        { title: "Voluntarios", url: "/voluntarios", icon: UserCheck },
+      ],
+    },
+    {
+      label: "Operaciones",
+      items: [
+        { title: "Citas", url: "/citas", icon: Calendar },
+      ],
+    },
+    {
+      label: "Análisis",
+      items: [
+        { title: "Reportes", url: "/reportes", icon: FileText },
+        { title: "Configuración", url: "/configuracion", icon: Settings2 },
+      ],
+    },
   ],
 }
 

@@ -20,7 +20,7 @@ import { useAuthStore } from "@/store/auth-store"
 export function AppSidebar() {
   const user = useAuthStore((s) => s.user)
   const role = user?.role ?? "callcenter"
-  const items = navConfig[role]
+  const groups = navConfig[role]
 
   return (
     <Sidebar collapsible="icon">
@@ -46,8 +46,8 @@ export function AppSidebar() {
 
       <SidebarSeparator />
 
-      <SidebarContent className="px-2 py-2">
-        <NavMain items={items} />
+      <SidebarContent>
+        <NavMain groups={groups} />
       </SidebarContent>
 
       <SidebarSeparator />

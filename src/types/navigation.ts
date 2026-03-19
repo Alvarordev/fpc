@@ -6,3 +6,8 @@ export interface NavItem {
   icon: LucideIcon
   highlight?: boolean
 }
+
+export interface NavGroup {
+  label: string
+  items: NavItem[]
+}

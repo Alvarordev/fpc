@@ -1,36 +1,45 @@
 "use client"
 
 import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PatientsToolbar } from "./patients-toolbar"
 import { PatientsTable } from "./patients-table"
 import { patientColumns } from "../_utils/patient-columns"
-import { patients, type PatientStatus } from "../_utils/patient-data"
+import { type Patient, type PatientStatus } from "../_utils/patient-data"
+import { API_URL } from "@/lib/auth"
 import { useRouter } from "next/navigation"
+
+async function fetchPatients(): Promise<Patient[]> {
+  const res = await fetch(`${API_URL}/patients`)
+  if (!res.ok) throw new Error("Error al cargar pacientes")
+  return res.json()
+}
 
 export function PatientsContent() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<PatientStatus | null>(null)
   const router = useRouter()
 
+  const { data: patients = [] } = useQuery({
+    queryKey: ["patients"],
+    queryFn: fetchPatients,
+  })
 
   const filtered = patients.filter((p) => {
-    const fullName = `${p.nombre} ${p.apellido}`.toLowerCase()
     const matchesSearch =
       !search ||
-      fullName.includes(search.toLowerCase()) ||
-      p.dni.includes(search) ||
-      p.diagnostico.toLowerCase().includes(search.toLowerCase())
+      p.q9_nombrePaciente.toLowerCase().includes(search.toLowerCase()) ||
+      p.q10_dni.includes(search)
 
     const matchesStatus = !statusFilter || p.estado === statusFilter
 
     return matchesSearch && matchesStatus
   })
 
-
   return (
-    <div className="space-y-5 max-w-7xl">
+    <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Pacientes</h1>
@@ -51,7 +60,11 @@ export function PatientsContent() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      <PatientsTable data={filtered} columns={patientColumns} />
+      <PatientsTable
+        data={filtered}
+        columns={patientColumns}
+        onRowClick={(p) => router.push(`/pacientes/${p.id}`)}
+      />
     </div>
   )
 }

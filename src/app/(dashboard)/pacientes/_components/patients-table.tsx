@@ -22,9 +22,10 @@ const PAGE_SIZE = 10
 interface PatientsTableProps {
   data: Patient[]
   columns: ColumnDef<Patient>[]
+  onRowClick?: (patient: Patient) => void
 }
 
-export function PatientsTable({ data, columns }: PatientsTableProps) {
+export function PatientsTable({ data, columns, onRowClick }: PatientsTableProps) {
   const table = useReactTable({
     data,
     columns,
@@ -62,6 +63,7 @@ export function PatientsTable({ data, columns }: PatientsTableProps) {
                 <TableRow
                   key={row.id}
                   className="border-border/40 cursor-pointer hover:bg-muted/30"
+                  onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="first:pl-4 last:pr-4 py-3">

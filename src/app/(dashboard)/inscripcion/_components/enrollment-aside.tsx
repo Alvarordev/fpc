@@ -68,7 +68,7 @@ export function EnrollmentAside({ content }: EnrollmentAsideProps) {
       </p>
 
       {content.script && (
-        <AsideCard title="Script" text={content.script} variant="script" />
+        <AsideCard title="Guión" text={content.script} variant="script" />
       )}
 
       {content.complianceNote && (

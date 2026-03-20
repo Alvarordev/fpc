@@ -6,10 +6,12 @@ import { UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PatientsToolbar } from "./patients-toolbar"
 import { PatientsTable } from "./patients-table"
+import { VolunteerPatientsContent } from "./volunteer-patients-content"
 import { patientColumns } from "../_utils/patient-columns"
 import { type Patient, type PatientStatus } from "../_utils/patient-data"
 import { API_URL } from "@/lib/auth"
 import { useRouter } from "next/navigation"
+import { useAuthStore } from "@/store/auth-store"
 
 async function fetchPatients(): Promise<Patient[]> {
   const res = await fetch(`${API_URL}/patients`)
@@ -21,6 +23,9 @@ export function PatientsContent() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<PatientStatus | null>(null)
   const router = useRouter()
+  const role = useAuthStore((s) => s.user?.role)
+
+  if (role === "voluntario") return <VolunteerPatientsContent />
 
   const { data: patients = [] } = useQuery({
     queryKey: ["patients"],

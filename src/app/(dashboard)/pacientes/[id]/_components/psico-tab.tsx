@@ -40,8 +40,8 @@ export function PsicoTab({ pacienteId }: PsicoTabProps) {
 
   const showCreateButton = canManage && canCreateMore
 
-  function getVolunteerName(voluntarioId: string): string {
-    const v = volunteers.find((vol) => String(vol.id) === voluntarioId)
+  function getVolunteerName(voluntarioId: number): string {
+    const v = volunteers.find((vol) => vol.id === voluntarioId)
     return v ? `${v.nombre} ${v.apellido}` : "Voluntario"
   }
 
@@ -105,7 +105,7 @@ export function PsicoTab({ pacienteId }: PsicoTabProps) {
               <div
                 key={`placeholder-${num}`}
                 className={cn(
-                  "min-w-[240px] max-w-[280px] shrink-0 rounded-xl border-2 border-dashed border-border/50",
+                  "min-w-60 max-w-70 shrink-0 rounded-xl border-2 border-dashed border-border/50",
                   "flex flex-col items-center justify-center gap-1.5 py-8 px-4 text-center"
                 )}
               >

@@ -168,7 +168,7 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
           session: {
             id: `ps${Date.now()}`,
             pacienteId,
-            voluntarioId: psicoVoluntarioId,
+            voluntarioId: Number(psicoVoluntarioId),
             availabilitySlotId: psicoSlotId,
             sesionNumero: existingSessions.length + 1,
             fecha: slot.fecha,

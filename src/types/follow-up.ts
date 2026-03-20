@@ -15,7 +15,7 @@ export interface FollowUpCall {
 export interface PsicoSession {
   id: string
   pacienteId: string
-  voluntarioId: string
+  voluntarioId: number
   availabilitySlotId?: string
   sesionNumero: number
   fecha: string

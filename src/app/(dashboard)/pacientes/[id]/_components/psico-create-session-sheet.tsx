@@ -80,7 +80,7 @@ export function PsicoCreateSessionSheet({
     const newSession: PsicoSession & { id: string } = {
       id: `ps${Date.now()}`,
       pacienteId,
-      voluntarioId: values.voluntarioId,
+      voluntarioId: Number(values.voluntarioId),
       availabilitySlotId: values.slotId,
       sesionNumero,
       fecha: slot.fecha,

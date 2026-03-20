@@ -101,7 +101,8 @@
       "trabaja": "No",
       "derivadoAsistentaSocial": "Sí",
       "participaGam": "Sí",
-      "satisfaccionPrograma": "Muy satisfecha"
+      "satisfaccionPrograma": "Muy satisfecha",
+      "generoCuidador": ""
     },
     {
       "id": "p002",
@@ -625,6 +626,70 @@
       "tipoSeguro": "SIS",
       "fechaCreacion": "2026-03-19T23:16:12.110Z",
       "estado": "activo"
+    },
+    {
+      "id": "1837",
+      "q1_comentarios": "",
+      "q2_horaInicio": "21:30",
+      "q3_acuerdo": "Sí",
+      "q4_tipo": "Para mi",
+      "q5_esPacienteOnco": "Sí",
+      "q6_esFamiliar": "",
+      "q7_nombreTercero": "",
+      "q8_consentimiento": "Acepto",
+      "q9_nombrePaciente": "Sandro Ivan Rodriguez Romero",
+      "q10_dni": "06775516",
+      "q11_fechaNacimiento": "1970-02-09",
+      "sexo": "Masculino",
+      "q12_lugarNacimiento": "LIMA",
+      "q13_direccion": "Jr General Orbegoso 246",
+      "q14_departamentoResidencia": "LIMA",
+      "zonificacion": "Urbano",
+      "q15_tiempoHospital": "15 minutos",
+      "q16_dniCoincide": "Si",
+      "q17_telefono": "961317221",
+      "q18_telefonoAuxiliar": "",
+      "q19_telefonoFamiliar": "",
+      "q20_nombreFamiliar": "",
+      "generoCuidador": "No aplica",
+      "q21_tieneWhatsapp": "Sí",
+      "q22_gradoInstruccion": "Educación superior",
+      "q23_lenguaOriginaria": "Castellano/Español",
+      "q24_requiereTraduccion": "No",
+      "q25_tieneSeguro": "Si",
+      "q26_tipoSeguro": "EsSalud",
+      "puntoIngreso": "Redes sociales FPC",
+      "q27_categoria": "Signos y Sintomas / EPS-ESSALUD",
+      "q43_eps": "Otros",
+      "q44_signosSintomas_eps": "Dolor general",
+      "q45_solicitoConsulta_eps": "Sí",
+      "q50_tiempoEspera_eps": "2 semanas",
+      "q47_establecimiento_eps": "HOSPITAL REBAGLIATI",
+      "q48_especialidad_eps": "Endocrinologia",
+      "q49_primeraConsulta_eps": "15/01/2026",
+      "q51_diagnostico_eps": "Ninguno",
+      "q52_siguienteConsulta_eps": "24/03/2026",
+      "q53_tieneTratamiento_eps": "No",
+      "q54_familiaresCharlas_eps": "Sí",
+      "q46_comentarios_eps": "",
+      "q132_encuestaAceptada": "Sí",
+      "q133_horaFin": "21:34",
+      "fechaEnrolamiento": "2026-03-19",
+      "mesEnrolamiento": "marzo",
+      "edad": "56",
+      "duracionLlamada": "4m",
+      "faseSalud": "Otros",
+      "nombresApellidos": "Sandro Ivan Rodriguez Romero",
+      "codigo": "06775516",
+      "numeroCelular": "961317221",
+      "numeroAuxiliar": "",
+      "lugarNacimiento": "LIMA",
+      "departamentoResidencia": "LIMA",
+      "gradoInstruccion": "Educación superior",
+      "lenguaOriginaria": "Castellano/Español",
+      "tipoSeguro": "EsSalud",
+      "fechaCreacion": "2026-03-20T02:34:39.577Z",
+      "estado": "activo"
     }
   ],
   "clinicalCases": [],
@@ -723,13 +788,43 @@
         "detalleEvolucion"
       ],
       "proximaLlamada": "2026-03-28"
+    },
+    {
+      "id": "fuc1773974215990",
+      "pacienteId": "1837",
+      "agenteId": "1",
+      "fecha": "2026-03-20",
+      "horaInicio": "21:35",
+      "horaFin": "21:36",
+      "tipo": "saliente",
+      "motivos": [
+        "diagnostico"
+      ],
+      "notas": "Te hicieron un diagnostico de cancer, leucemia. Indicamos que tiene que ir a hacerse un chequeo y que lo hara en la proxima semana.",
+      "camposActualizados": [],
+      "proximaLlamada": "2026-03-26"
+    },
+    {
+      "id": "fuc1773977887093",
+      "pacienteId": "b4f7",
+      "agenteId": "1",
+      "fecha": "2026-03-20",
+      "horaInicio": "22:36",
+      "horaFin": "22:37",
+      "tipo": "entrante",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Paciente comenta que se registro en el SIS, fue a dar su examen pero no lo pudieron atender.",
+      "camposActualizados": [],
+      "proximaLlamada": "2026-03-31"
     }
   ],
   "psicoSessions": [
     {
       "id": "ps001",
       "pacienteId": "p001",
-      "voluntarioId": "1",
+      "voluntarioId": 1,
       "availabilitySlotId": "8",
       "sesionNumero": 1,
       "fecha": "2026-03-11",
@@ -743,7 +838,7 @@
     {
       "id": "ps002",
       "pacienteId": "p001",
-      "voluntarioId": "1",
+      "voluntarioId": 1,
       "availabilitySlotId": "10",
       "sesionNumero": 2,
       "fecha": "2026-03-13",
@@ -757,7 +852,7 @@
     {
       "id": "ps003",
       "pacienteId": "p004",
-      "voluntarioId": "7",
+      "voluntarioId": 7,
       "availabilitySlotId": "9",
       "sesionNumero": 1,
       "fecha": "2026-03-12",
@@ -770,7 +865,7 @@
     {
       "id": "ps004",
       "pacienteId": "p004",
-      "voluntarioId": "7",
+      "voluntarioId": 7,
       "sesionNumero": 2,
       "fecha": "2026-03-26",
       "horaInicio": "10:00",
@@ -782,7 +877,7 @@
     {
       "id": "ps1773957892812",
       "pacienteId": "b4f7",
-      "voluntarioId": "2",
+      "voluntarioId": 2,
       "availabilitySlotId": "17",
       "sesionNumero": 1,
       "fecha": "2026-03-20",
@@ -796,7 +891,7 @@
     {
       "id": "ps005",
       "pacienteId": "p001",
-      "voluntarioId": "1",
+      "voluntarioId": 1,
       "sesionNumero": 3,
       "fecha": "2026-03-25",
       "horaInicio": "10:00",
@@ -808,11 +903,86 @@
     {
       "id": "ps006",
       "pacienteId": "p004",
-      "voluntarioId": "1",
+      "voluntarioId": 1,
       "sesionNumero": 1,
       "fecha": "2026-03-27",
       "horaInicio": "14:00",
       "horaFin": "15:00",
+      "modalidad": "videollamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps007",
+      "pacienteId": "p002",
+      "voluntarioId": 1,
+      "sesionNumero": 1,
+      "fecha": "2026-04-01",
+      "horaInicio": "09:00",
+      "horaFin": "10:00",
+      "modalidad": "llamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps008",
+      "pacienteId": "p004",
+      "voluntarioId": 1,
+      "sesionNumero": 2,
+      "fecha": "2026-04-07",
+      "horaInicio": "14:00",
+      "horaFin": "15:00",
+      "modalidad": "videollamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps009",
+      "pacienteId": "p001",
+      "voluntarioId": 1,
+      "sesionNumero": 4,
+      "fecha": "2026-04-14",
+      "horaInicio": "10:00",
+      "horaFin": "11:00",
+      "modalidad": "llamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps1773972346038",
+      "pacienteId": "b4f7",
+      "voluntarioId": 1,
+      "availabilitySlotId": "20",
+      "sesionNumero": 2,
+      "fecha": "2026-03-24",
+      "horaInicio": "14:00",
+      "horaFin": "16:00",
+      "modalidad": "videollamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps1773974216099",
+      "pacienteId": "1837",
+      "voluntarioId": 1,
+      "availabilitySlotId": "24",
+      "sesionNumero": 1,
+      "fecha": "2026-04-01",
+      "horaInicio": "09:00",
+      "horaFin": "12:00",
+      "modalidad": "videollamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps1773974261337",
+      "pacienteId": "1837",
+      "voluntarioId": 1,
+      "availabilitySlotId": "29",
+      "sesionNumero": 1,
+      "fecha": "2026-04-07",
+      "horaInicio": "09:00",
+      "horaFin": "11:00",
       "modalidad": "videollamada",
       "estado": "programada",
       "notas": ""
@@ -1042,7 +1212,7 @@
       "fecha": "2026-03-24",
       "horaInicio": "14:00",
       "horaFin": "16:00",
-      "estado": "disponible"
+      "estado": "asignado"
     },
     {
       "id": "21",
@@ -1074,7 +1244,7 @@
       "fecha": "2026-04-01",
       "horaInicio": "09:00",
       "horaFin": "12:00",
-      "estado": "disponible"
+      "estado": "asignado"
     },
     {
       "id": "25",
@@ -1114,7 +1284,7 @@
       "fecha": "2026-04-07",
       "horaInicio": "09:00",
       "horaFin": "11:00",
-      "estado": "disponible"
+      "estado": "asignado"
     },
     {
       "id": "30",
@@ -1243,6 +1413,46 @@
       "horaInicio": "09:00",
       "horaFin": "11:00",
       "estado": "disponible"
+    },
+    {
+      "id": "ecf6",
+      "voluntarioId": 1,
+      "fecha": "2026-03-31",
+      "horaInicio": "09:00",
+      "horaFin": "11:00",
+      "estado": "disponible"
+    },
+    {
+      "id": "1fa2",
+      "voluntarioId": 1,
+      "fecha": "2026-03-24",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
+      "estado": "disponible"
+    },
+    {
+      "id": "af2d",
+      "voluntarioId": 1,
+      "fecha": "2026-03-31",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
+      "estado": "disponible"
+    },
+    {
+      "id": "eeb0",
+      "voluntarioId": 1,
+      "fecha": "2026-04-07",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
+      "estado": "disponible"
+    },
+    {
+      "id": "5245",
+      "voluntarioId": 1,
+      "fecha": "2026-04-14",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
+      "estado": "disponible"
     }
   ],
   "educationalTalks": [],
@@ -1288,6 +1498,11 @@
       "id": "h008",
       "nombre": "HOSPITAL REGIONAL HONORIO DELGADO",
       "ciudad": "Arequipa"
+    },
+    {
+      "id": "h1773974006747",
+      "nombre": "HOSPITAL REBAGLIATI",
+      "ciudad": "Lima"
     }
   ],
   "hospitalAlerts": [
@@ -1319,6 +1534,24 @@
       "fecha": "2026-02-20",
       "estado": "resuelta",
       "fechaResolucion": "2026-03-01"
+    },
+    {
+      "id": "ha1773974216068",
+      "hospitalId": "h1773974006747",
+      "pacienteId": "1837",
+      "agenteId": "1",
+      "detalle": "Demora en la atencion porque no habia citas.",
+      "fecha": "2026-03-20",
+      "estado": "activa"
+    },
+    {
+      "id": "ha1773977887156",
+      "hospitalId": "h1773974006747",
+      "pacienteId": "b4f7",
+      "agenteId": "1",
+      "detalle": "No funciona el ecografo desde el dia de 19/03/2026.",
+      "fecha": "2026-03-20",
+      "estado": "activa"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

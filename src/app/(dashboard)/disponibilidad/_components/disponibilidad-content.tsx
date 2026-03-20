@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CalendarHeader } from "@/components/calendar-header"
-import { useAuthStore } from "@/store/auth-store"
+import { useVolunteerProfileId } from "@/hooks/use-volunteer-profile-id"
 import { useMySlots, useDeleteSlot } from "../_hooks/use-availability"
 import { DisponibilidadCalendar } from "./disponibilidad-calendar"
 import { AddAvailabilitySheet } from "./add-availability-sheet"
@@ -15,8 +15,7 @@ const CURRENT_YEAR = NOW.getFullYear()
 const CURRENT_MONTH = NOW.getMonth()
 
 export function DisponibilidadContent() {
-  const user = useAuthStore((s) => s.user)
-  const voluntarioId = user?.volunteerProfileId ?? ""
+  const voluntarioId = useVolunteerProfileId() ?? ""
 
   const [year, setYear] = useState(CURRENT_YEAR)
   const [month, setMonth] = useState(CURRENT_MONTH)

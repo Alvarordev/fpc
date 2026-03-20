@@ -14,7 +14,7 @@ export interface AsideContent {
 const STEP_CONTENT: Record<number, AsideContent> = {
   1: {
     script:
-      "Buenos días / Buenas Tardes. Bienvenido/a al Programa SEPA de la Fundación Peruana de Cáncer. Le saluda [Nombre], ejecutiva del programa SEPA. ¿Me brinda su nombre por favor?",
+      "Buenos días / Buenas Tardes. Bienvenido/a al Programa SEPA de la Fundación Peruana de Cáncer. Le saluda [Nombre], ejecutiva del programa SEPA. ¿Me brinda su nombre por favor? \n Estimado(a) _____ Le comentamos que el programa SEPA es un programa que brinda Servicios gratuitos de Educación en Prevención del Cáncer y Acompañamiento al Paciente con cáncer. ¿Cuál es el motivo de su llamada?",
     checklist: [
       { text: "Presentarse al inicio de la llamada con nombre completo" },
       { text: "Anotar comentarios relevantes antes de continuar" },
@@ -25,7 +25,7 @@ const STEP_CONTENT: Record<number, AsideContent> = {
 
   2: {
     script:
-      "Para poder continuar, es preciso mencionarle que esta llamada se encuentra regida por la Ley 26842 y la Ley 29733 sobre la protección de Datos Personales. Esta llamada podría ser grabada por temas de calidad. ¿Está usted de acuerdo con continuar?",
+      "Sra./Sr. .......... Para poder continuar, es preciso mencionarle que esta llamada se encuentra conforme a sus derechos como usuario de los servicios de Salud Ley 26842 y Ley 29733 sobre la protección de Datos Personales. Le comentamos que esta llamada podría ser grabada por temas de calidad. ¿Realizaremos un registro para continuar con la inscripción dentro del programa Sepa. ¿Esta usted de acuerdo?",
     checklist: [
       { text: "Obtener acuerdo explícito del paciente antes de continuar" },
       { text: "Identificar si la afiliación es propia o de un tercero" },
@@ -48,7 +48,18 @@ const STEP_CONTENT: Record<number, AsideContent> = {
 
   4: {
     script:
-      "Le voy a leer el consentimiento informado. Al finalizar la lectura, por favor indíqueme si acepta o no acepta participar en el Programa SEPA y autorizar el uso de sus datos.",
+      `Por otro lado, Le solicitamos que autorice oficialmente su inscripción al Programa SEPA y el uso de sus datos personales al brindarnos su consentimiento verbal. Para ello, le leeremos el consentimiento informado y al final de este, usted nos debe comentar si acepta o no acepta.
+
+"Por este medio, usted deja constancia:
+- Ha sido informado sobre el funcionamiento del Programa SEPA de la Fundación Peruana de Cáncer.
+- Acepta y tiene conocimiento que este programa lo/a acompañará a lo largo de la duración de este.
+- Acepta que la Fundación Peruana de Cáncer recolecte, almacene, transfiera, administre y utilice sus datos personales y de salud recogidos.
+- Entiende que puede solicitar que sus datos sean actualizados, rectificados o solicitar que no sean utilizados en el futuro y/o eliminarlos de la base de datos del Programa SEPA.
+- Tiene conocimiento de que el Programa SEPA es un programa de acceso libre, gratuito y voluntario patrocinado por la Fundación Peruana de Cáncer y que esta se reserva el derecho de suspenderlo y/o terminarlo y/o modificarlo.
+- Acepta ser contactado y recibir los materiales correspondientes al Programa SEPA a través de su teléfono o el de un familiar y su correo, si lo tuviese.
+- Tiene conocimiento de que puede solicitar a la Fundación Peruana de Cáncer en cualquier momento activar o desactivar cualquiera de dichos canales de comunicación con usted."
+
+Por favor me confirma si acepta y confirma tener conocimiento todo lo detallado en el texto leído:`,
     checklist: [
       { text: "Leer el consentimiento completo sin interrupciones" },
       { text: "Registrar la respuesta del paciente con exactitud" },

@@ -54,7 +54,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>
 
 const fl =
-  'text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground/70'
+  'min-h-8 text-[10px] font-bold uppercase leading-tight tracking-[0.1em] text-muted-foreground/70'
 const ic = 'bg-card border focus-visible:ring-1 focus-visible:ring-primary/40'
 const sc =
   'w-full bg-card border focus-visible:ring-1 focus-visible:ring-primary/40'

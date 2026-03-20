@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import type { Volunteer } from "@/types/volunteer"
-import { getVolunteerColor } from "../_utils/calendar-helpers"
+import { getVolunteerColor } from "@/lib/calendar-helpers"
 
 interface CalendarLegendProps {
   volunteers: Volunteer[]

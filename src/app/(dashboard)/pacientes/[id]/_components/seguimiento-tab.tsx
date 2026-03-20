@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Phone, CalendarClock, PhoneCall, Plus, TriangleAlert } from "lucide-react"
+import { Phone, CalendarClock, PhoneCall, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuthStore } from "@/store/auth-store"
 import { useFollowUpCalls, buildTimeline } from "../_hooks/use-follow-up"
@@ -9,7 +9,6 @@ import { usePsicoSessions } from "../_hooks/use-psico-sessions"
 import { useHospitalAlerts } from "@/hooks/use-hospitals"
 import { TimelineEventCard } from "./timeline-event-card"
 import { FollowUpCallSheet } from "./follow-up-call-sheet"
-import { HospitalAlertSheet } from "./hospital-alert-sheet"
 import { HospitalAlertsPanel } from "./hospital-alerts-panel"
 
 function formatShortDate(fecha: string): string {
@@ -30,7 +29,6 @@ export function SeguimientoTab({ pacienteId, fechaCreacion }: SeguimientoTabProp
   const canManage = ["callcenter", "admin", "fundacion"].includes(user?.role ?? "")
 
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [alertSheetOpen, setAlertSheetOpen] = useState(false)
 
   const { data: calls = [], isLoading: loadingCalls } = useFollowUpCalls(pacienteId)
   const { data: psicoSessions = [], isLoading: loadingPsico } = usePsicoSessions(pacienteId)
@@ -98,16 +96,10 @@ export function SeguimientoTab({ pacienteId, fechaCreacion }: SeguimientoTabProp
         </div>
 
         {canManage && (
-          <div className="flex gap-2 shrink-0">
-            <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setAlertSheetOpen(true)}>
-              <TriangleAlert className="size-4" />
-              Reportar alerta
-            </Button>
-            <Button size="sm" className="gap-1.5" onClick={() => setSheetOpen(true)}>
-              <Plus className="size-4" />
-              Registrar llamada
-            </Button>
-          </div>
+          <Button size="sm" className="gap-1.5 shrink-0" onClick={() => setSheetOpen(true)}>
+            <Plus className="size-4" />
+            Registrar llamada
+          </Button>
         )}
       </div>
 
@@ -132,11 +124,6 @@ export function SeguimientoTab({ pacienteId, fechaCreacion }: SeguimientoTabProp
       <FollowUpCallSheet
         open={sheetOpen}
         onOpenChange={setSheetOpen}
-        pacienteId={pacienteId}
-      />
-      <HospitalAlertSheet
-        open={alertSheetOpen}
-        onOpenChange={setAlertSheetOpen}
         pacienteId={pacienteId}
       />
     </div>

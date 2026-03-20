@@ -3,13 +3,11 @@ import {
   Users,
   ClipboardList,
   Phone,
-  Calendar,
   BarChart3,
   CalendarDays,
   Clock,
   UserCheck,
-  FileText,
-  Settings2,
+  TriangleAlert,
 } from "lucide-react"
 import type { NavGroup } from "@/types/navigation"
 import type { UserRole } from "@/types/auth"
@@ -28,7 +26,7 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
       label: "Seguimiento",
       items: [
         { title: "Llamadas", url: "/llamadas", icon: Phone },
-        { title: "Citas", url: "/citas", icon: Calendar },
+        { title: "Alertas", url: "/alertas", icon: TriangleAlert },
       ],
     },
     {
@@ -53,12 +51,6 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
         { title: "Disponibilidad", url: "/disponibilidad", icon: Clock },
       ],
     },
-    {
-      label: "Análisis",
-      items: [
-        { title: "Reportes", url: "/reportes", icon: FileText },
-      ],
-    },
   ],
   fundacion: [
     {
@@ -72,14 +64,7 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
     {
       label: "Operaciones",
       items: [
-        { title: "Citas", url: "/citas", icon: Calendar },
-      ],
-    },
-    {
-      label: "Análisis",
-      items: [
-        { title: "Reportes", url: "/reportes", icon: FileText },
-        { title: "Configuración", url: "/configuracion", icon: Settings2 },
+        { title: "Alertas", url: "/alertas", icon: TriangleAlert },
       ],
     },
   ],
@@ -95,14 +80,7 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
     {
       label: "Operaciones",
       items: [
-        { title: "Citas", url: "/citas", icon: Calendar },
-      ],
-    },
-    {
-      label: "Análisis",
-      items: [
-        { title: "Reportes", url: "/reportes", icon: FileText },
-        { title: "Configuración", url: "/configuracion", icon: Settings2 },
+        { title: "Alertas", url: "/alertas", icon: TriangleAlert },
       ],
     },
   ],
@@ -113,11 +91,9 @@ export const pathTitles: Record<string, string> = {
   "/pacientes": "Pacientes",
   "/inscripcion": "Inscripción",
   "/llamadas": "Llamadas y Seguimiento",
-  "/citas": "Citas",
   "/metricas": "Mis Métricas",
   "/agenda": "Mi Agenda",
   "/disponibilidad": "Disponibilidad",
   "/voluntarios": "Voluntarios",
-  "/reportes": "Reportes y Análisis",
-  "/configuracion": "Configuración",
+  "/alertas": "Alertas y Hospitales",
 }

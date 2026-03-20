@@ -19,8 +19,9 @@
       "id": "3",
       "email": "voluntario@fpc.org.pe",
       "password": "voluntario123",
-      "name": "Voluntario FPC",
-      "role": "voluntario"
+      "name": "Ana García",
+      "role": "voluntario",
+      "volunteerProfileId": "1"
     },
     {
       "id": "4",
@@ -156,7 +157,14 @@
       "situacionTratamiento": "Pendiente inicio",
       "comorbilidad": "Diabetes tipo 2",
       "trabaja": "No",
-      "limitacionConsultas": "Distancia y costo de transporte"
+      "limitacionConsultas": "Distancia y costo de transporte",
+      "dxConSepa": "",
+      "situacionDxOncologico": "",
+      "tiempoEsperaDx": "",
+      "categorizacionHospital": "",
+      "especialidad": "",
+      "sintomaChequeo": "",
+      "detalleDerivacion": ""
     },
     {
       "id": "p003",
@@ -631,9 +639,15 @@
       "horaInicio": "10:00",
       "horaFin": "10:25",
       "tipo": "saliente",
-      "motivos": ["afiliacion_sis", "consulta_medica"],
+      "motivos": [
+        "afiliacion_sis",
+        "consulta_medica"
+      ],
       "notas": "Paciente confirmó inicio de trámite SIS. Próxima cita médica el 20/11.",
-      "camposActualizados": ["afiliacionSisDesdeSepa", "fechaAfiliacionSis"],
+      "camposActualizados": [
+        "afiliacionSisDesdeSepa",
+        "fechaAfiliacionSis"
+      ],
       "proximaLlamada": "2025-11-24"
     },
     {
@@ -644,9 +658,15 @@
       "horaInicio": "09:30",
       "horaFin": "09:50",
       "tipo": "entrante",
-      "motivos": ["tratamiento"],
+      "motivos": [
+        "tratamiento"
+      ],
       "notas": "Paciente reporta buena tolerancia a quimioterapia. Se coordina sesión psico.",
-      "camposActualizados": ["tipoTratamiento", "situacionTratamiento", "fecha1erTratamiento"],
+      "camposActualizados": [
+        "tipoTratamiento",
+        "situacionTratamiento",
+        "fecha1erTratamiento"
+      ],
       "proximaLlamada": "2026-01-10"
     },
     {
@@ -657,9 +677,14 @@
       "horaInicio": "11:00",
       "horaFin": "11:20",
       "tipo": "saliente",
-      "motivos": ["diagnostico"],
+      "motivos": [
+        "diagnostico"
+      ],
       "notas": "Se brindó información sobre FISSAL. Paciente tiene dificultades para movilizarse.",
-      "camposActualizados": ["conoceFissal", "limitacionConsultas"],
+      "camposActualizados": [
+        "conoceFissal",
+        "limitacionConsultas"
+      ],
       "proximaLlamada": "2025-10-06"
     },
     {
@@ -670,9 +695,15 @@
       "horaInicio": "14:00",
       "horaFin": "14:30",
       "tipo": "saliente",
-      "motivos": ["afiliacion_sis", "tratamiento"],
+      "motivos": [
+        "afiliacion_sis",
+        "tratamiento"
+      ],
       "notas": "Se inició trámite SIS. Confirmada fecha de inicio de radioterapia.",
-      "camposActualizados": ["afiliacionSisDesdeSepa", "fecha1erTratamiento"],
+      "camposActualizados": [
+        "afiliacionSisDesdeSepa",
+        "fecha1erTratamiento"
+      ],
       "proximaLlamada": "2026-02-08"
     },
     {
@@ -683,9 +714,14 @@
       "horaInicio": "10:00",
       "horaFin": "10:20",
       "tipo": "saliente",
-      "motivos": ["evolucion"],
+      "motivos": [
+        "evolucion"
+      ],
       "notas": "Paciente evoluciona favorablemente. Refiere reducción del dolor.",
-      "camposActualizados": ["evolucionEnfermedad", "detalleEvolucion"],
+      "camposActualizados": [
+        "evolucionEnfermedad",
+        "detalleEvolucion"
+      ],
       "proximaLlamada": "2026-03-28"
     }
   ],
@@ -756,6 +792,30 @@
       "estado": "completada",
       "notas": "Sesión inicial. Buena disposición al proceso terapéutico.",
       "satisfaccion": 5
+    },
+    {
+      "id": "ps005",
+      "pacienteId": "p001",
+      "voluntarioId": "1",
+      "sesionNumero": 3,
+      "fecha": "2026-03-25",
+      "horaInicio": "10:00",
+      "horaFin": "11:00",
+      "modalidad": "llamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps006",
+      "pacienteId": "p004",
+      "voluntarioId": "1",
+      "sesionNumero": 1,
+      "fecha": "2026-03-27",
+      "horaInicio": "14:00",
+      "horaFin": "15:00",
+      "modalidad": "videollamada",
+      "estado": "programada",
+      "notas": ""
     }
   ],
   "volunteers": [
@@ -1189,14 +1249,46 @@
   "talkRegistrations": [],
   "enrollmentAuditLog": [],
   "hospitals": [
-    { "id": "h001", "nombre": "HOSPITAL NACIONAL EDGARDO REBAGLIATI MARTINS", "ciudad": "Lima" },
-    { "id": "h002", "nombre": "HOSPITAL NACIONAL ARZOBISPO LOAYZA", "ciudad": "Lima" },
-    { "id": "h003", "nombre": "HOSPITAL MARIA AUXILIADORA", "ciudad": "Lima" },
-    { "id": "h004", "nombre": "INSTITUTO NACIONAL DE ENFERMEDADES NEOPLASICAS", "ciudad": "Lima" },
-    { "id": "h005", "nombre": "HOSPITAL NACIONAL DOS DE MAYO", "ciudad": "Lima" },
-    { "id": "h006", "nombre": "HOSPITAL NACIONAL GUILLERMO ALMENARA IRIGOYEN", "ciudad": "Lima" },
-    { "id": "h007", "nombre": "HOSPITAL NACIONAL CAYETANO HEREDIA", "ciudad": "Lima" },
-    { "id": "h008", "nombre": "HOSPITAL REGIONAL HONORIO DELGADO", "ciudad": "Arequipa" }
+    {
+      "id": "h001",
+      "nombre": "HOSPITAL NACIONAL EDGARDO REBAGLIATI MARTINS",
+      "ciudad": "Lima"
+    },
+    {
+      "id": "h002",
+      "nombre": "HOSPITAL NACIONAL ARZOBISPO LOAYZA",
+      "ciudad": "Lima"
+    },
+    {
+      "id": "h003",
+      "nombre": "HOSPITAL MARIA AUXILIADORA",
+      "ciudad": "Lima"
+    },
+    {
+      "id": "h004",
+      "nombre": "INSTITUTO NACIONAL DE ENFERMEDADES NEOPLASICAS",
+      "ciudad": "Lima"
+    },
+    {
+      "id": "h005",
+      "nombre": "HOSPITAL NACIONAL DOS DE MAYO",
+      "ciudad": "Lima"
+    },
+    {
+      "id": "h006",
+      "nombre": "HOSPITAL NACIONAL GUILLERMO ALMENARA IRIGOYEN",
+      "ciudad": "Lima"
+    },
+    {
+      "id": "h007",
+      "nombre": "HOSPITAL NACIONAL CAYETANO HEREDIA",
+      "ciudad": "Lima"
+    },
+    {
+      "id": "h008",
+      "nombre": "HOSPITAL REGIONAL HONORIO DELGADO",
+      "ciudad": "Arequipa"
+    }
   ],
   "hospitalAlerts": [
     {
@@ -1215,7 +1307,8 @@
       "agenteId": "2",
       "detalle": "Problemas con la entrega de medicamentos quimioterápicos. El servicio de farmacia indica desabastecimiento temporal de AC-Taxol.",
       "fecha": "2026-03-15",
-      "estado": "activa"
+      "estado": "resuelta",
+      "fechaResolucion": "2026-03-20"
     },
     {
       "id": "ha003",

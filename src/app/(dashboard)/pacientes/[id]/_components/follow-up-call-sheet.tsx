@@ -3,6 +3,8 @@
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { useState } from "react"
+import { ChevronDown, ChevronUp, TriangleAlert, Brain } from "lucide-react"
 import {
   Sheet,
   SheetContent,
@@ -25,6 +27,10 @@ import { cn } from "@/lib/utils"
 import { MOTIVOS_CONFIG } from "@/types/follow-up"
 import { useAuthStore } from "@/store/auth-store"
 import { useCreateFollowUpCall } from "../_hooks/use-follow-up"
+import { usePsicoSessions, useVolunteers, useAvailableSlots, useCreatePsicoSession } from "../_hooks/use-psico-sessions"
+import { HospitalSelect } from "@/components/hospital-select"
+import { useHospitals, useCreateHospitalAlert } from "@/hooks/use-hospitals"
+import type { AvailabilitySlot } from "@/types/volunteer"
 
 const schema = z.object({
   tipo: z.enum(["saliente", "entrante"]),
@@ -42,6 +48,15 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10)
 }
 
+function formatSlot(slot: AvailabilitySlot): string {
+  const date = new Date(slot.fecha + "T12:00:00").toLocaleDateString("es-PE", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  })
+  return `${date} — ${slot.horaInicio} a ${slot.horaFin}`
+}
+
 interface FollowUpCallSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -51,6 +66,28 @@ interface FollowUpCallSheetProps {
 export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCallSheetProps) {
   const user = useAuthStore((s) => s.user)
   const createCall = useCreateFollowUpCall(pacienteId)
+
+  const { data: hospitals = [] } = useHospitals()
+  const createAlert = useCreateHospitalAlert()
+
+  const { data: existingSessions = [] } = usePsicoSessions(pacienteId)
+  const { data: volunteers = [] } = useVolunteers()
+  const createSession = useCreatePsicoSession(pacienteId)
+
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [alertHospital, setAlertHospital] = useState("")
+  const [alertDetalle, setAlertDetalle] = useState("")
+
+  const [psicoOpen, setPsicoOpen] = useState(false)
+  const [psicoVoluntarioId, setPsicoVoluntarioId] = useState("")
+  const [psicoSlotId, setPsicoSlotId] = useState("")
+  const [psicoModalidad, setPsicoModalidad] = useState<"llamada" | "videollamada">("llamada")
+
+  const { data: availableSlots = [] } = useAvailableSlots(psicoVoluntarioId)
+  const activeVolunteers = volunteers.filter((v) => v.estado === "activo")
+  const slotsForVolunteer = availableSlots.filter(
+    (s) => String(s.voluntarioId) === psicoVoluntarioId
+  )
 
   const {
     register,
@@ -84,6 +121,17 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
     )
   }
 
+  function resetAll() {
+    reset({ tipo: "saliente", fecha: todayISO(), horaInicio: "", horaFin: "", motivos: [], notas: "", proximaLlamada: "" })
+    setAlertOpen(false)
+    setAlertHospital("")
+    setAlertDetalle("")
+    setPsicoOpen(false)
+    setPsicoVoluntarioId("")
+    setPsicoSlotId("")
+    setPsicoModalidad("llamada")
+  }
+
   async function onSubmit(values: FormValues) {
     await createCall.mutateAsync({
       id: `fuc${Date.now()}`,
@@ -98,13 +146,50 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
       camposActualizados: [],
       ...(values.proximaLlamada ? { proximaLlamada: values.proximaLlamada } : {}),
     })
-    reset({ tipo: "saliente", fecha: todayISO(), horaInicio: "", horaFin: "", motivos: [], notas: "", proximaLlamada: "" })
+
+    if (alertOpen && alertHospital && alertDetalle.trim()) {
+      const hospital = hospitals.find((h) => h.nombre === alertHospital)
+      if (hospital) {
+        await createAlert.mutateAsync({
+          hospitalId: hospital.id,
+          pacienteId,
+          agenteId: String(user?.id ?? ""),
+          detalle: alertDetalle.trim(),
+          fecha: values.fecha,
+          estado: "activa",
+        })
+      }
+    }
+
+    if (psicoOpen && psicoVoluntarioId && psicoSlotId) {
+      const slot = availableSlots.find((s) => String(s.id) === psicoSlotId)
+      if (slot) {
+        await createSession.mutateAsync({
+          session: {
+            id: `ps${Date.now()}`,
+            pacienteId,
+            voluntarioId: psicoVoluntarioId,
+            availabilitySlotId: psicoSlotId,
+            sesionNumero: existingSessions.length + 1,
+            fecha: slot.fecha,
+            horaInicio: slot.horaInicio,
+            horaFin: slot.horaFin,
+            modalidad: psicoModalidad,
+            estado: "programada",
+            notas: "",
+          },
+          slotId: psicoSlotId,
+        })
+      }
+    }
+
+    resetAll()
     onOpenChange(false)
   }
 
-  function handleOpenChange(open: boolean) {
-    if (!open) reset({ tipo: "saliente", fecha: todayISO(), horaInicio: "", horaFin: "", motivos: [], notas: "", proximaLlamada: "" })
-    onOpenChange(open)
+  function handleOpenChange(val: boolean) {
+    if (!val) resetAll()
+    onOpenChange(val)
   }
 
   return (
@@ -194,6 +279,151 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
               <p className="text-xs text-muted-foreground">
                 Si acordó una próxima comunicación, indique la fecha aquí.
               </p>
+            </div>
+
+            <div className="space-y-2 pt-2 border-t border-border/60">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Acciones durante la llamada
+              </p>
+
+              <div className="rounded-xl border bg-card overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setAlertOpen((v) => !v)}
+                  className="flex w-full items-center justify-between px-4 py-3 text-sm hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <TriangleAlert className="size-4 text-amber-500" />
+                    <span className="font-medium">Reportar problema en hospital</span>
+                  </div>
+                  {alertOpen ? (
+                    <ChevronUp className="size-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="size-4 text-muted-foreground" />
+                  )}
+                </button>
+
+                {alertOpen && (
+                  <div className="px-4 pb-4 space-y-3 border-t border-border/60 pt-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Establecimiento con problema</Label>
+                      <HospitalSelect value={alertHospital} onChange={setAlertHospital} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Descripción del problema</Label>
+                      <Textarea
+                        placeholder="¿Qué problema reportó el paciente en este establecimiento?"
+                        value={alertDetalle}
+                        onChange={(e) => setAlertDetalle(e.target.value)}
+                        className="min-h-20 text-sm resize-none"
+                      />
+                    </div>
+                    {alertOpen && (!alertHospital || !alertDetalle.trim()) && (
+                      <p className="text-xs text-muted-foreground">
+                        Completa ambos campos para crear la alerta al guardar la llamada.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-xl border bg-card overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setPsicoOpen((v) => !v)}
+                  className="flex w-full items-center justify-between px-4 py-3 text-sm hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Brain className="size-4 text-violet-500" />
+                    <span className="font-medium">Agendar sesión de psicooncología</span>
+                  </div>
+                  {psicoOpen ? (
+                    <ChevronUp className="size-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="size-4 text-muted-foreground" />
+                  )}
+                </button>
+
+                {psicoOpen && (
+                  <div className="px-4 pb-4 space-y-3 border-t border-border/60 pt-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Voluntario / Psicólogo</Label>
+                      <Select
+                        value={psicoVoluntarioId}
+                        onValueChange={(v) => {
+                          if (v) {
+                            setPsicoVoluntarioId(v)
+                            setPsicoSlotId("")
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Seleccionar voluntario" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {activeVolunteers.map((v) => (
+                            <SelectItem key={String(v.id)} value={String(v.id)}>
+                              {v.nombre} {v.apellido} — {v.especialidad}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Horario disponible</Label>
+                      <Select
+                        value={psicoSlotId}
+                        onValueChange={(v) => v && setPsicoSlotId(v)}
+                        disabled={!psicoVoluntarioId}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue
+                            placeholder={
+                              !psicoVoluntarioId
+                                ? "Primero seleccione un voluntario"
+                                : slotsForVolunteer.length === 0
+                                ? "Sin horarios disponibles"
+                                : "Seleccionar horario"
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {slotsForVolunteer
+                            .sort((a, b) => a.fecha.localeCompare(b.fecha))
+                            .map((slot) => (
+                              <SelectItem key={String(slot.id)} value={String(slot.id)}>
+                                {formatSlot(slot)}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Medio de consulta</Label>
+                      <Select
+                        value={psicoModalidad}
+                        onValueChange={(v) => v && setPsicoModalidad(v as "llamada" | "videollamada")}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="llamada">Llamada</SelectItem>
+                          <SelectItem value="videollamada">Videollamada</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {psicoOpen && (!psicoVoluntarioId || !psicoSlotId) && (
+                      <p className="text-xs text-muted-foreground">
+                        Selecciona voluntario y horario para agendar la sesión al guardar la llamada.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

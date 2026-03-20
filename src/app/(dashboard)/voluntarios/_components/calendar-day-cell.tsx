@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import type { AvailabilitySlot, Volunteer } from "@/types/volunteer"
-import { formatTimeRange, getVolunteerColor } from "../_utils/calendar-helpers"
+import { formatTimeRange, getVolunteerColor } from "@/lib/calendar-helpers"
 
 interface CalendarDayCellProps {
   date: Date

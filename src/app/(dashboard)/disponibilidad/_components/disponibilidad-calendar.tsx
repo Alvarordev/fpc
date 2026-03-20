@@ -1,22 +1,34 @@
-import type { AvailabilitySlot, Volunteer } from "@/types/volunteer"
 import { getDaysInMonth, groupSlotsByDay, WEEKDAY_LABELS } from "@/lib/calendar-helpers"
-import { CalendarDayCell } from "./calendar-day-cell"
+import { DisponibilidadDayCell } from "./disponibilidad-day-cell"
+import type { AvailabilitySlot } from "@/types/volunteer"
 
-interface AvailabilityCalendarProps {
+const TODAY = (() => {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return d
+})()
+
+function isPastDate(date: Date): boolean {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  return d < TODAY
+}
+
+interface DisponibilidadCalendarProps {
   year: number
   month: number
   slots: AvailabilitySlot[]
-  volunteers: Volunteer[]
-  highlightedIds: string[]
+  onDayClick: (date: Date) => void
+  onSlotDelete: (slot: AvailabilitySlot) => void
 }
 
-export function AvailabilityCalendar({
+export function DisponibilidadCalendar({
   year,
   month,
   slots,
-  volunteers,
-  highlightedIds,
-}: AvailabilityCalendarProps) {
+  onDayClick,
+  onSlotDelete,
+}: DisponibilidadCalendarProps) {
   const days = getDaysInMonth(year, month)
   const slotsByDay = groupSlotsByDay(slots, year, month)
 
@@ -37,13 +49,14 @@ export function AvailabilityCalendar({
           const isoKey = date.toISOString().slice(0, 10)
           const daySlots = slotsByDay.get(isoKey) ?? []
           return (
-            <CalendarDayCell
+            <DisponibilidadDayCell
               key={i}
               date={date}
               currentMonth={month}
               slots={daySlots}
-              volunteers={volunteers}
-              highlightedIds={highlightedIds}
+              isPast={isPastDate(date)}
+              onDayClick={onDayClick}
+              onSlotDelete={onSlotDelete}
             />
           )
         })}

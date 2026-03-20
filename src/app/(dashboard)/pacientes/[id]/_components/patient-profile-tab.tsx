@@ -7,9 +7,10 @@ import { ProfileSection } from "./profile-section"
 interface PatientProfileTabProps {
   patient: Patient
   onSave: (values: Record<string, string>) => Promise<void>
+  readOnly?: boolean
 }
 
-export function PatientProfileTab({ patient, onSave }: PatientProfileTabProps) {
+export function PatientProfileTab({ patient, onSave, readOnly }: PatientProfileTabProps) {
   const data = patient as unknown as Record<string, string>
 
   return (
@@ -21,6 +22,7 @@ export function PatientProfileTab({ patient, onSave }: PatientProfileTabProps) {
           fields={section.fields}
           data={data}
           onSave={onSave}
+          readOnly={readOnly}
         />
       ))}
     </div>

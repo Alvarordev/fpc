@@ -545,6 +545,78 @@
       "sexo": "",
       "zonificacion": "",
       "generoCuidador": ""
+    },
+    {
+      "id": "f7ae",
+      "q1_comentarios": "Ninguna",
+      "q2_horaInicio": "15:43",
+      "q3_acuerdo": "Sí",
+      "q4_tipo": "Para mi",
+      "q5_esPacienteOnco": "Sí",
+      "q6_esFamiliar": "",
+      "q7_nombreTercero": "",
+      "q8_consentimiento": "Acepto",
+      "q9_nombrePaciente": "Nuria Arlette Rodriguez Aguilar",
+      "q10_dni": "74778515",
+      "q11_fechaNacimiento": "2004-07-28",
+      "q12_lugarNacimiento": "LIMA",
+      "q13_direccion": "Jr. General Orbegoso 246",
+      "q14_departamentoResidencia": "LIMA",
+      "q15_tiempoHospital": "1 hora",
+      "q16_dniCoincide": "Si",
+      "q17_telefono": "927087987",
+      "q18_telefonoAuxiliar": "",
+      "q19_telefonoFamiliar": "",
+      "q20_nombreFamiliar": "",
+      "q21_tieneWhatsapp": "Sí",
+      "q22_gradoInstruccion": "Secundaria",
+      "q23_lenguaOriginaria": "Quechua",
+      "q24_requiereTraduccion": "Sí",
+      "q25_tieneSeguro": "Si",
+      "q26_tipoSeguro": "SIS",
+      "q27_categoria": "Diagnóstico de Cáncer / Seguro",
+      "q_tipoCancer_ds": "Leucemia",
+      "q_estadio_ds": "2",
+      "q_establecimiento_ds": "",
+      "q_tieneInforme_ds": "No",
+      "q_recibeTratamiento_ds": "No",
+      "q_tratamiento_ds": "",
+      "q_psico_ds": "Sí",
+      "q72_social_ds": "No",
+      "q81_familiaresCharlas_ds": "No",
+      "sexo": "Femenino",
+      "zonificacion": "Urbano",
+      "generoCuidador": "No aplica",
+      "puntoIngreso": "Llamada directa",
+      "q_sintomaChequeo_ds": "Dolor general",
+      "q_fechaDx_ds": "20/05/2025",
+      "q_tiempoEsperaDx_ds": "2 semanas",
+      "q_hospitalDx_ds": "Hospital",
+      "q_especialidadDx_ds": "Traumatologia",
+      "q_asisteConsultas_ds": "No",
+      "q_ultimaConsulta_ds": "",
+      "q_siguienteConsulta_ds": "",
+      "q_limitacionConsultas_ds": "",
+      "q_tipoTratamiento_ds": "",
+      "q_situacionTratamiento_ds": "",
+      "q132_encuestaAceptada": "Sí",
+      "q133_horaFin": "18:16",
+      "fechaEnrolamiento": "2026-03-19",
+      "mesEnrolamiento": "marzo",
+      "edad": "21",
+      "duracionLlamada": "2h 33m",
+      "faseSalud": "Diagnóstico Cáncer",
+      "nombresApellidos": "Nuria Arlette Rodriguez Aguilar",
+      "codigo": "74778515",
+      "numeroCelular": "927087987",
+      "numeroAuxiliar": "",
+      "lugarNacimiento": "LIMA",
+      "departamentoResidencia": "LIMA",
+      "gradoInstruccion": "Secundaria",
+      "lenguaOriginaria": "Quechua",
+      "tipoSeguro": "SIS",
+      "fechaCreacion": "2026-03-19T23:16:12.110Z",
+      "estado": "activo"
     }
   ],
   "clinicalCases": [],
@@ -558,15 +630,11 @@
       "fecha": "2025-11-10",
       "horaInicio": "10:00",
       "horaFin": "10:25",
-      "motivos": [
-        "afiliacion_sis",
-        "consulta_medica"
-      ],
+      "tipo": "saliente",
+      "motivos": ["afiliacion_sis", "consulta_medica"],
       "notas": "Paciente confirmó inicio de trámite SIS. Próxima cita médica el 20/11.",
-      "camposActualizados": [
-        "afiliacionSisDesdeSepa",
-        "fechaAfiliacionSis"
-      ]
+      "camposActualizados": ["afiliacionSisDesdeSepa", "fechaAfiliacionSis"],
+      "proximaLlamada": "2025-11-24"
     },
     {
       "id": "fuc002",
@@ -575,15 +643,11 @@
       "fecha": "2025-12-05",
       "horaInicio": "09:30",
       "horaFin": "09:50",
-      "motivos": [
-        "tratamiento"
-      ],
-      "notas": "Paciente reporta buena tolerancia a quimioterapia. Se coordina psico.",
-      "camposActualizados": [
-        "tipoTratamiento",
-        "situacionTratamiento",
-        "fecha1erTratamiento"
-      ]
+      "tipo": "entrante",
+      "motivos": ["tratamiento"],
+      "notas": "Paciente reporta buena tolerancia a quimioterapia. Se coordina sesión psico.",
+      "camposActualizados": ["tipoTratamiento", "situacionTratamiento", "fecha1erTratamiento"],
+      "proximaLlamada": "2026-01-10"
     },
     {
       "id": "fuc003",
@@ -592,14 +656,11 @@
       "fecha": "2025-09-22",
       "horaInicio": "11:00",
       "horaFin": "11:20",
-      "motivos": [
-        "diagnostico"
-      ],
+      "tipo": "saliente",
+      "motivos": ["diagnostico"],
       "notas": "Se brindó información sobre FISSAL. Paciente tiene dificultades para movilizarse.",
-      "camposActualizados": [
-        "conoceFissal",
-        "limitacionConsultas"
-      ]
+      "camposActualizados": ["conoceFissal", "limitacionConsultas"],
+      "proximaLlamada": "2025-10-06"
     },
     {
       "id": "fuc004",
@@ -608,15 +669,11 @@
       "fecha": "2026-01-25",
       "horaInicio": "14:00",
       "horaFin": "14:30",
-      "motivos": [
-        "afiliacion_sis",
-        "tratamiento"
-      ],
+      "tipo": "saliente",
+      "motivos": ["afiliacion_sis", "tratamiento"],
       "notas": "Se inició trámite SIS. Confirmada fecha de inicio de radioterapia.",
-      "camposActualizados": [
-        "afiliacionSisDesdeSepa",
-        "fecha1erTratamiento"
-      ]
+      "camposActualizados": ["afiliacionSisDesdeSepa", "fecha1erTratamiento"],
+      "proximaLlamada": "2026-02-08"
     },
     {
       "id": "fuc005",
@@ -625,14 +682,11 @@
       "fecha": "2026-02-15",
       "horaInicio": "10:00",
       "horaFin": "10:20",
-      "motivos": [
-        "evolucion"
-      ],
+      "tipo": "saliente",
+      "motivos": ["evolucion"],
       "notas": "Paciente evoluciona favorablemente. Refiere reducción del dolor.",
-      "camposActualizados": [
-        "evolucionEnfermedad",
-        "detalleEvolucion"
-      ]
+      "camposActualizados": ["evolucionEnfermedad", "detalleEvolucion"],
+      "proximaLlamada": "2026-03-28"
     }
   ],
   "psicoSessions": [
@@ -700,7 +754,8 @@
       "horaFin": "12:00",
       "modalidad": "videollamada",
       "estado": "completada",
-      "notas": "Sesión inicial. Buena disposición al proceso terapéutico."
+      "notas": "Sesión inicial. Buena disposición al proceso terapéutico.",
+      "satisfaccion": 5
     }
   ],
   "volunteers": [
@@ -1133,5 +1188,45 @@
   "educationalTalks": [],
   "talkRegistrations": [],
   "enrollmentAuditLog": [],
+  "hospitals": [
+    { "id": "h001", "nombre": "HOSPITAL NACIONAL EDGARDO REBAGLIATI MARTINS", "ciudad": "Lima" },
+    { "id": "h002", "nombre": "HOSPITAL NACIONAL ARZOBISPO LOAYZA", "ciudad": "Lima" },
+    { "id": "h003", "nombre": "HOSPITAL MARIA AUXILIADORA", "ciudad": "Lima" },
+    { "id": "h004", "nombre": "INSTITUTO NACIONAL DE ENFERMEDADES NEOPLASICAS", "ciudad": "Lima" },
+    { "id": "h005", "nombre": "HOSPITAL NACIONAL DOS DE MAYO", "ciudad": "Lima" },
+    { "id": "h006", "nombre": "HOSPITAL NACIONAL GUILLERMO ALMENARA IRIGOYEN", "ciudad": "Lima" },
+    { "id": "h007", "nombre": "HOSPITAL NACIONAL CAYETANO HEREDIA", "ciudad": "Lima" },
+    { "id": "h008", "nombre": "HOSPITAL REGIONAL HONORIO DELGADO", "ciudad": "Arequipa" }
+  ],
+  "hospitalAlerts": [
+    {
+      "id": "ha001",
+      "hospitalId": "h004",
+      "pacienteId": "p001",
+      "agenteId": "2",
+      "detalle": "Paciente reporta que no hay turnos disponibles para análisis de sangre hasta el próximo mes. Se recomienda consultar en el módulo de admisión antes de acudir.",
+      "fecha": "2026-03-10",
+      "estado": "activa"
+    },
+    {
+      "id": "ha002",
+      "hospitalId": "h001",
+      "pacienteId": "p002",
+      "agenteId": "2",
+      "detalle": "Problemas con la entrega de medicamentos quimioterápicos. El servicio de farmacia indica desabastecimiento temporal de AC-Taxol.",
+      "fecha": "2026-03-15",
+      "estado": "activa"
+    },
+    {
+      "id": "ha003",
+      "hospitalId": "h002",
+      "pacienteId": "p004",
+      "agenteId": "2",
+      "detalle": "El servicio de radioterapia estuvo suspendido por mantenimiento de equipos. Ya fue resuelto.",
+      "fecha": "2026-02-20",
+      "estado": "resuelta",
+      "fechaResolucion": "2026-03-01"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { usePatient, useUpdatePatient } from "../_hooks/use-patient"
 import { PatientProfileTab } from "./patient-profile-tab"
 import { PsicoTab } from "./psico-tab"
+import { SeguimientoTab } from "./seguimiento-tab"
 import { statusLabels } from "@/types/patient"
 import type { PatientStatus } from "@/types/patient"
 
@@ -106,10 +107,7 @@ export function PatientDetailContent({ id }: PatientDetailContentProps) {
         </TabsContent>
 
         <TabsContent value="seguimiento">
-          <div className="flex flex-col items-center justify-center h-48 gap-2 text-center">
-            <p className="text-sm font-medium text-foreground">Seguimiento</p>
-            <p className="text-xs text-muted-foreground">Disponible próximamente</p>
-          </div>
+          <SeguimientoTab pacienteId={id} fechaCreacion={patient.fechaCreacion} />
         </TabsContent>
 
         <TabsContent value="psicooncologia">

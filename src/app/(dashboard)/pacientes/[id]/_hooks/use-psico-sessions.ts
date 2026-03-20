@@ -17,9 +17,9 @@ async function fetchVolunteers(): Promise<Volunteer[]> {
   return res.json()
 }
 
-async function fetchAvailableSlots(voluntarioId: string): Promise<AvailabilitySlot[]> {
+async function fetchAvailableSlots(): Promise<AvailabilitySlot[]> {
   const res = await fetch(
-    `${API_URL}/availabilitySlots?voluntarioId=${voluntarioId}&estado=disponible`
+    `${API_URL}/availabilitySlots?estado=disponible`
   )
   if (!res.ok) throw new Error("Error al cargar horarios")
   return res.json()
@@ -41,8 +41,8 @@ export function useVolunteers() {
 
 export function useAvailableSlots(voluntarioId: string) {
   return useQuery({
-    queryKey: ["availabilitySlots", voluntarioId],
-    queryFn: () => fetchAvailableSlots(voluntarioId),
+    queryKey: ["availabilitySlots"],
+    queryFn: fetchAvailableSlots,
     enabled: Boolean(voluntarioId),
   })
 }

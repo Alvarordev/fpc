@@ -1,5 +1,4 @@
 {
-  "items": [],
   "users": [
     {
       "id": "1",
@@ -756,9 +755,6 @@
       "estado": "activo"
     }
   ],
-  "clinicalCases": [],
-  "psychooncologyServices": [],
-  "sessions": [],
   "followUpCalls": [
     {
       "id": "fuc001",

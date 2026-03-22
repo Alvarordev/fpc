@@ -690,6 +690,70 @@
       "tipoSeguro": "EsSalud",
       "fechaCreacion": "2026-03-20T02:34:39.577Z",
       "estado": "activo"
+    },
+    {
+      "id": "9bc8",
+      "q1_comentarios": "",
+      "q2_horaInicio": "08:38",
+      "q3_acuerdo": "Sí",
+      "q4_tipo": "Para mi",
+      "q5_esPacienteOnco": "Sí",
+      "q6_esFamiliar": "",
+      "q7_nombreTercero": "",
+      "q8_consentimiento": "Acepto",
+      "q9_nombrePaciente": "Juan Manuel Perez Gomez",
+      "q10_dni": "747789065",
+      "q11_fechaNacimiento": "2000-04-12",
+      "sexo": "Masculino",
+      "q12_lugarNacimiento": "LIMA",
+      "q13_direccion": "Calle Siempre Viva 123",
+      "q14_departamentoResidencia": "LIMA",
+      "zonificacion": "Urbano",
+      "q15_tiempoHospital": "30 minutos",
+      "q16_dniCoincide": "Si",
+      "q17_telefono": "988276901",
+      "q18_telefonoAuxiliar": "",
+      "q19_telefonoFamiliar": "",
+      "q20_nombreFamiliar": "",
+      "generoCuidador": "No aplica",
+      "q21_tieneWhatsapp": "Sí",
+      "q22_gradoInstruccion": "Secundaria",
+      "q23_lenguaOriginaria": "Castellano/Español",
+      "q24_requiereTraduccion": "No",
+      "q25_tieneSeguro": "Si",
+      "q26_tipoSeguro": "EsSalud",
+      "puntoIngreso": "Referido por paciente",
+      "q27_categoria": "Signos y Sintomas / EPS-ESSALUD",
+      "q43_eps": "PACIFICO SEGUROS",
+      "q44_signosSintomas_eps": "Dolor general",
+      "q45_solicitoConsulta_eps": "Sí",
+      "q50_tiempoEspera_eps": "2 semanas",
+      "q47_establecimiento_eps": "HOSPITAL REBAGLIATI",
+      "q48_especialidad_eps": "Oncologia",
+      "q49_primeraConsulta_eps": "12/01/2026",
+      "q51_diagnostico_eps": "Ninguno",
+      "q52_siguienteConsulta_eps": "No he generado ninguna cita",
+      "q53_tieneTratamiento_eps": "No",
+      "q54_familiaresCharlas_eps": "Sí",
+      "q46_comentarios_eps": "",
+      "q132_encuestaAceptada": "Sí",
+      "q133_horaFin": "09:02",
+      "fechaEnrolamiento": "2026-03-20",
+      "mesEnrolamiento": "marzo",
+      "edad": "25",
+      "duracionLlamada": "24m",
+      "faseSalud": "Otros",
+      "nombresApellidos": "Juan Manuel Perez Gomez",
+      "codigo": "747789065",
+      "numeroCelular": "988276901",
+      "numeroAuxiliar": "",
+      "lugarNacimiento": "LIMA",
+      "departamentoResidencia": "LIMA",
+      "gradoInstruccion": "Secundaria",
+      "lenguaOriginaria": "Castellano/Español",
+      "tipoSeguro": "EsSalud",
+      "fechaCreacion": "2026-03-20T14:04:10.909Z",
+      "estado": "activo"
     }
   ],
   "clinicalCases": [],
@@ -818,6 +882,51 @@
       "notas": "Paciente comenta que se registro en el SIS, fue a dar su examen pero no lo pudieron atender.",
       "camposActualizados": [],
       "proximaLlamada": "2026-03-31"
+    },
+    {
+      "id": "fuc1774014315984",
+      "pacienteId": "p001",
+      "agenteId": "1",
+      "fecha": "2026-03-20",
+      "horaInicio": "08:44",
+      "horaFin": "09:22",
+      "tipo": "saliente",
+      "motivos": [
+        "afiliacion_sis"
+      ],
+      "notas": "Usuario se afilio al SIS",
+      "camposActualizados": [],
+      "proximaLlamada": "2026-03-23"
+    },
+    {
+      "id": "fuc1774014424009",
+      "pacienteId": "f7ae",
+      "agenteId": "1",
+      "fecha": "2026-03-20",
+      "horaInicio": "08:46",
+      "horaFin": "10:00",
+      "tipo": "saliente",
+      "motivos": [
+        "consulta_medica"
+      ],
+      "notas": "Paciente fue hacer su consulta medica en ESSALUD",
+      "camposActualizados": [],
+      "proximaLlamada": "2026-03-25"
+    },
+    {
+      "id": "fuc1774016001692",
+      "pacienteId": "9bc8",
+      "agenteId": "1",
+      "fecha": "2026-03-20",
+      "horaInicio": "09:12",
+      "horaFin": "09:40",
+      "tipo": "saliente",
+      "motivos": [
+        "consulta_medica"
+      ],
+      "notas": "Diagnosticaorn que tiene cancer estadio 3",
+      "camposActualizados": [],
+      "proximaLlamada": "2026-03-30"
     }
   ],
   "psicoSessions": [
@@ -983,6 +1092,32 @@
       "fecha": "2026-04-07",
       "horaInicio": "09:00",
       "horaFin": "11:00",
+      "modalidad": "videollamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps1774014509503",
+      "pacienteId": "f7ae",
+      "voluntarioId": 1,
+      "availabilitySlotId": "ecf6",
+      "sesionNumero": 1,
+      "fecha": "2026-03-31",
+      "horaInicio": "09:00",
+      "horaFin": "11:00",
+      "modalidad": "videollamada",
+      "estado": "programada",
+      "notas": ""
+    },
+    {
+      "id": "ps1774016003787",
+      "pacienteId": "9bc8",
+      "voluntarioId": 1,
+      "availabilitySlotId": "eeb0",
+      "sesionNumero": 1,
+      "fecha": "2026-04-07",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
       "modalidad": "videollamada",
       "estado": "programada",
       "notas": ""
@@ -1420,7 +1555,7 @@
       "fecha": "2026-03-31",
       "horaInicio": "09:00",
       "horaFin": "11:00",
-      "estado": "disponible"
+      "estado": "asignado"
     },
     {
       "id": "1fa2",
@@ -1444,12 +1579,44 @@
       "fecha": "2026-04-07",
       "horaInicio": "18:00",
       "horaFin": "20:00",
-      "estado": "disponible"
+      "estado": "asignado"
     },
     {
       "id": "5245",
       "voluntarioId": 1,
       "fecha": "2026-04-14",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
+      "estado": "disponible"
+    },
+    {
+      "id": "2909",
+      "voluntarioId": 1,
+      "fecha": "2026-04-16",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
+      "estado": "disponible"
+    },
+    {
+      "id": "7652",
+      "voluntarioId": 1,
+      "fecha": "2026-04-09",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
+      "estado": "disponible"
+    },
+    {
+      "id": "91db",
+      "voluntarioId": 1,
+      "fecha": "2026-04-02",
+      "horaInicio": "18:00",
+      "horaFin": "20:00",
+      "estado": "disponible"
+    },
+    {
+      "id": "57bd",
+      "voluntarioId": 1,
+      "fecha": "2026-03-26",
       "horaInicio": "18:00",
       "horaFin": "20:00",
       "estado": "disponible"

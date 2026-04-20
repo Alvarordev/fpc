@@ -2,70 +2,183 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { API_URL } from "@/lib/auth"
-import type { FollowUpCall, PsicoSession, TimelineEvent } from "@/types/follow-up"
+import type { PsicoSession } from "@/types/follow-up"
 import type { HospitalAlert } from "@/types/hospital"
+import type { Contact, TimelineEvent } from "@/types/contact"
 
-async function fetchFollowUpCalls(pacienteId: string): Promise<FollowUpCall[]> {
-  const res = await fetch(`${API_URL}/followUpCalls?pacienteId=${pacienteId}`)
-  if (!res.ok) throw new Error("Error al cargar llamadas")
-  return res.json()
+function normalizeContact(raw: Partial<Contact>): Contact {
+  return {
+    id: String(raw.id ?? `ct-${Date.now()}`),
+    pacienteId: String(raw.pacienteId ?? ""),
+    agenteId: String(raw.agenteId ?? ""),
+    origen: raw.origen ?? "seguimiento",
+    tipo: raw.tipo ?? "saliente",
+    estado: raw.estado ?? "completado",
+    fecha: String(raw.fecha ?? ""),
+    horaInicio: raw.horaInicio,
+    horaFin: raw.horaFin,
+    motivos: Array.isArray(raw.motivos) ? raw.motivos : [],
+    notas: raw.notas ?? "",
+    camposActualizados: Array.isArray(raw.camposActualizados)
+      ? raw.camposActualizados
+      : [],
+    motivoInconcluso: raw.motivoInconcluso,
+  }
 }
 
-export function useFollowUpCalls(pacienteId: string) {
+async function fetchContacts(pacienteId: string): Promise<Contact[]> {
+  const contactsRes = await fetch(`${API_URL}/contacts?pacienteId=${pacienteId}`)
+  if (contactsRes.ok) {
+    const data = (await contactsRes.json()) as Array<
+      Partial<Contact> & { proximaLlamada?: string }
+    >
+    const normalized = data.flatMap((item) => {
+      const base = normalizeContact(item)
+      const next = item.proximaLlamada
+        ? normalizeContact({
+            id: `scheduled-${base.id}`,
+            pacienteId: base.pacienteId,
+            agenteId: base.agenteId,
+            origen: "seguimiento",
+            tipo: "saliente",
+            estado: "agendado",
+            fecha: item.proximaLlamada,
+            motivos: [],
+            notas: "Contacto de seguimiento agendado",
+            camposActualizados: [],
+          })
+        : null
+      return next ? [base, next] : [base]
+    })
+
+    if (normalized.length > 0) {
+      return normalized
+    }
+  }
+
+  const legacyRes = await fetch(`${API_URL}/followUpCalls?pacienteId=${pacienteId}`)
+  if (!legacyRes.ok) throw new Error("Error al cargar contactos")
+  const legacy = (await legacyRes.json()) as Array<
+    Partial<Contact> & { proximaLlamada?: string }
+  >
+  const mapped = legacy.flatMap((item) => {
+    const base = normalizeContact({
+      ...item,
+      origen: "seguimiento",
+      estado: "completado",
+    })
+    const next = item.proximaLlamada
+      ? normalizeContact({
+          id: `scheduled-${base.id}`,
+          pacienteId: base.pacienteId,
+          agenteId: base.agenteId,
+          origen: "seguimiento",
+          tipo: "saliente",
+          estado: "agendado",
+          fecha: item.proximaLlamada,
+          motivos: [],
+          notas: "Contacto de seguimiento agendado",
+          camposActualizados: [],
+        })
+      : null
+    return next ? [base, next] : [base]
+  })
+  return mapped
+}
+
+export function useContacts(pacienteId: string) {
   return useQuery({
-    queryKey: ["followUpCalls", pacienteId],
-    queryFn: () => fetchFollowUpCalls(pacienteId),
+    queryKey: ["contacts", pacienteId],
+    queryFn: () => fetchContacts(pacienteId),
   })
 }
 
-export function useCreateFollowUpCall(pacienteId: string) {
+export function useCreateContact(pacienteId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (call: FollowUpCall) => {
-      const res = await fetch(`${API_URL}/followUpCalls`, {
+    mutationFn: async (contact: Contact) => {
+      const res = await fetch(`${API_URL}/contacts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(call),
+        body: JSON.stringify(contact),
       })
-      if (!res.ok) throw new Error("Error al registrar llamada")
-      return res.json() as Promise<FollowUpCall>
+      if (!res.ok) throw new Error("Error al registrar contacto")
+      return res.json() as Promise<Contact>
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["followUpCalls", pacienteId] })
+      queryClient.invalidateQueries({ queryKey: ["contacts", pacienteId] })
+    },
+  })
+}
+
+export function useUpdateContact(pacienteId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Contact> }) => {
+      const res = await fetch(`${API_URL}/contacts/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      if (!res.ok) throw new Error("Error al actualizar contacto")
+      return res.json() as Promise<Contact>
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contacts", pacienteId] })
+      queryClient.invalidateQueries({ queryKey: ["callcenterContacts"] })
     },
   })
 }
 
 export function buildTimeline(
-  calls: FollowUpCall[],
+  contacts: Contact[],
   psicoSessions: PsicoSession[],
-  fechaCreacion: string,
+  fechaCreacion?: string,
   hospitalAlerts: HospitalAlert[] = []
 ): TimelineEvent[] {
   const events: TimelineEvent[] = []
 
-  events.push({
-    id: "enrollment",
-    type: "inscripcion",
-    fecha: fechaCreacion,
-    title: "Inscripción en el programa",
-    description: "Paciente registrado en SEPA",
-  })
-
-  for (const call of calls) {
+  const hasEnrollmentContact = contacts.some((c) => c.origen === "enrolamiento")
+  if (!hasEnrollmentContact && fechaCreacion) {
     events.push({
-      id: call.id,
-      type: "llamada",
-      fecha: call.fecha,
-      title: call.tipo === "entrante" ? "Llamada entrante del paciente" : "Llamada de seguimiento",
-      description: call.notas,
+      id: `enroll-${fechaCreacion}`,
+      type: "contacto",
+      fecha: fechaCreacion.slice(0, 10),
+      title: "Inscripción en el programa",
+      description: "Contacto inicial de enrolamiento",
       meta: {
-        tipo: call.tipo,
-        horaInicio: call.horaInicio,
-        horaFin: call.horaFin,
-        motivos: call.motivos,
-        camposActualizados: call.camposActualizados,
-        proximaLlamada: call.proximaLlamada,
+        origen: "enrolamiento",
+        tipo: "entrante",
+        estado: "completado",
+      },
+    })
+  }
+
+  for (const contact of contacts) {
+    const isEnrollment = contact.origen === "enrolamiento"
+    const title = isEnrollment
+      ? "Inscripción en el programa"
+      : contact.estado === "agendado"
+        ? "Contacto de seguimiento agendado"
+        : contact.tipo === "entrante"
+          ? "Llamada entrante del paciente"
+          : "Llamada de seguimiento"
+
+    events.push({
+      id: contact.id,
+      type: "contacto",
+      fecha: contact.fecha,
+      title,
+      description: contact.notas,
+      meta: {
+        origen: contact.origen,
+        tipo: contact.tipo,
+        estado: contact.estado,
+        horaInicio: contact.horaInicio,
+        horaFin: contact.horaFin,
+        motivos: contact.motivos,
+        camposActualizados: contact.camposActualizados,
+        motivoInconcluso: contact.motivoInconcluso,
       },
     })
   }
@@ -103,3 +216,6 @@ export function buildTimeline(
 
   return events.sort((a, b) => b.fecha.localeCompare(a.fecha))
 }
+
+export const useFollowUpCalls = useContacts
+export const useCreateFollowUpCall = useCreateContact

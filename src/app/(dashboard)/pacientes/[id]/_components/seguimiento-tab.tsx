@@ -1,14 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Phone, CalendarClock, PhoneCall, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuthStore } from "@/store/auth-store"
-import { useFollowUpCalls, buildTimeline } from "../_hooks/use-follow-up"
+import { useContacts, buildTimeline } from "../_hooks/use-follow-up"
 import { usePsicoSessions } from "../_hooks/use-psico-sessions"
 import { useHospitalAlerts } from "@/hooks/use-hospitals"
 import { TimelineEventCard } from "./timeline-event-card"
-import { FollowUpCallSheet } from "./follow-up-call-sheet"
 import { HospitalAlertsPanel } from "./hospital-alerts-panel"
 
 function formatShortDate(fecha: string): string {
@@ -25,26 +24,27 @@ interface SeguimientoTabProps {
 }
 
 export function SeguimientoTab({ pacienteId, fechaCreacion }: SeguimientoTabProps) {
+  const router = useRouter()
   const user = useAuthStore((s) => s.user)
   const canManage = ["callcenter", "admin", "fundacion"].includes(user?.role ?? "")
 
-  const [sheetOpen, setSheetOpen] = useState(false)
-
-  const { data: calls = [], isLoading: loadingCalls } = useFollowUpCalls(pacienteId)
+  const { data: contacts = [], isLoading: loadingContacts } = useContacts(pacienteId)
   const { data: psicoSessions = [], isLoading: loadingPsico } = usePsicoSessions(pacienteId)
   const { data: allAlerts = [] } = useHospitalAlerts()
 
-  const isLoading = loadingCalls || loadingPsico
+  const isLoading = loadingContacts || loadingPsico
 
   const patientAlerts = allAlerts.filter((a) => a.pacienteId === pacienteId)
-  const timeline = buildTimeline(calls, psicoSessions, fechaCreacion, patientAlerts)
+  const timeline = buildTimeline(contacts, psicoSessions, fechaCreacion, patientAlerts)
 
-  const lastCall = [...calls].sort((a, b) => b.fecha.localeCompare(a.fecha))[0]
+  const completedContacts = contacts.filter((c) => c.estado !== "agendado")
+  const scheduledContacts = contacts.filter((c) => c.estado === "agendado")
 
-  const nextCall = calls
-    .filter((c) => c.proximaLlamada)
-    .sort((a, b) => (a.proximaLlamada ?? "").localeCompare(b.proximaLlamada ?? ""))
-    .at(-1)?.proximaLlamada
+  const lastContact = [...completedContacts].sort((a, b) => b.fecha.localeCompare(a.fecha))[0]
+
+  const nextContact = [...scheduledContacts]
+    .sort((a, b) => a.fecha.localeCompare(b.fecha))
+    .at(0)?.fecha
 
   return (
     <div className="space-y-5">
@@ -54,32 +54,32 @@ export function SeguimientoTab({ pacienteId, fechaCreacion }: SeguimientoTabProp
             <div className="flex size-8 items-center justify-center rounded-full bg-blue-50">
               <Phone className="size-4 text-blue-600" />
             </div>
-            <div>
-              <p className="font-medium text-foreground">{calls.length}</p>
-              <p className="text-xs text-muted-foreground">llamadas registradas</p>
+              <div>
+                <p className="font-medium text-foreground">{contacts.length}</p>
+                <p className="text-xs text-muted-foreground">contactos registrados</p>
+              </div>
             </div>
-          </div>
 
-          {lastCall && (
+          {lastContact && (
             <div className="flex items-center gap-2 text-sm">
               <div className="flex size-8 items-center justify-center rounded-full bg-muted">
                 <PhoneCall className="size-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="font-medium text-foreground">{formatShortDate(lastCall.fecha)}</p>
+                <p className="font-medium text-foreground">{formatShortDate(lastContact.fecha)}</p>
                 <p className="text-xs text-muted-foreground">último contacto</p>
               </div>
             </div>
           )}
 
-          {nextCall ? (
+          {nextContact ? (
             <div className="flex items-center gap-2 text-sm">
               <div className="flex size-8 items-center justify-center rounded-full bg-amber-50">
                 <CalendarClock className="size-4 text-amber-600" />
               </div>
               <div>
-                <p className="font-medium text-foreground">{formatShortDate(nextCall)}</p>
-                <p className="text-xs text-muted-foreground">próxima llamada</p>
+                <p className="font-medium text-foreground">{formatShortDate(nextContact)}</p>
+                <p className="text-xs text-muted-foreground">próximo contacto</p>
               </div>
             </div>
           ) : (
@@ -89,16 +89,20 @@ export function SeguimientoTab({ pacienteId, fechaCreacion }: SeguimientoTabProp
               </div>
               <div>
                 <p className="font-medium text-muted-foreground">Sin programar</p>
-                <p className="text-xs text-muted-foreground">próxima llamada</p>
+                <p className="text-xs text-muted-foreground">próximo contacto</p>
               </div>
             </div>
           )}
         </div>
 
         {canManage && (
-          <Button size="sm" className="gap-1.5 shrink-0" onClick={() => setSheetOpen(true)}>
+          <Button
+            size="sm"
+            className="gap-1.5 shrink-0"
+            onClick={() => router.push(`/pacientes/${pacienteId}/contacto`)}
+          >
             <Plus className="size-4" />
-            Registrar llamada
+            Registrar contacto
           </Button>
         )}
       </div>
@@ -121,11 +125,6 @@ export function SeguimientoTab({ pacienteId, fechaCreacion }: SeguimientoTabProp
         </div>
       )}
 
-      <FollowUpCallSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        pacienteId={pacienteId}
-      />
     </div>
   )
 }

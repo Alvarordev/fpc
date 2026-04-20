@@ -24,6 +24,7 @@ export function usePatient(id: string) {
   return useQuery({
     queryKey: ["patients", id],
     queryFn: () => fetchPatient(id),
+    enabled: Boolean(id),
   })
 }
 

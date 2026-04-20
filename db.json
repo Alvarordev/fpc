@@ -755,15 +755,174 @@
       "estado": "activo"
     }
   ],
-  "followUpCalls": [
+  "contacts": [
+    {
+      "id": "ct-enroll-p005",
+      "pacienteId": "p005",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-03-14",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "11:00",
+      "horaFin": "11:30"
+    },
+    {
+      "id": "ct-enroll-p009",
+      "pacienteId": "p009",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-05-18",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "10:05",
+      "horaFin": "10:42"
+    },
+    {
+      "id": "ct-enroll-p003",
+      "pacienteId": "p003",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-06-22",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "14:00",
+      "horaFin": "14:38"
+    },
+    {
+      "id": "ct-enroll-p007",
+      "pacienteId": "p007",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-07-30",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "09:50",
+      "horaFin": "10:28"
+    },
+    {
+      "id": "ct-enroll-p010",
+      "pacienteId": "p010",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-08-25",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "16:15",
+      "horaFin": "16:50"
+    },
+    {
+      "id": "ct-enroll-p002",
+      "pacienteId": "p002",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-09-15",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "10:30",
+      "horaFin": "11:05"
+    },
+    {
+      "id": "fuc003",
+      "pacienteId": "p002",
+      "agenteId": "2",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2025-09-22",
+      "motivos": [
+        "diagnostico"
+      ],
+      "notas": "Se brindó información sobre FISSAL. Paciente tiene dificultades para movilizarse.",
+      "camposActualizados": [
+        "conoceFissal",
+        "limitacionConsultas"
+      ],
+      "horaInicio": "11:00",
+      "horaFin": "11:20"
+    },
+    {
+      "id": "scheduled-fuc003",
+      "pacienteId": "p002",
+      "agenteId": "2",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2025-10-06",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "ct-enroll-p008",
+      "pacienteId": "p008",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-10-11",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "14:30",
+      "horaFin": "15:08"
+    },
+    {
+      "id": "ct-enroll-p001",
+      "pacienteId": "p001",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-11-03",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "09:10",
+      "horaFin": "09:42"
+    },
     {
       "id": "fuc001",
       "pacienteId": "p001",
       "agenteId": "2",
-      "fecha": "2025-11-10",
-      "horaInicio": "10:00",
-      "horaFin": "10:25",
+      "origen": "seguimiento",
       "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2025-11-10",
       "motivos": [
         "afiliacion_sis",
         "consulta_medica"
@@ -773,16 +932,45 @@
         "afiliacionSisDesdeSepa",
         "fechaAfiliacionSis"
       ],
-      "proximaLlamada": "2025-11-24"
+      "horaInicio": "10:00",
+      "horaFin": "10:25"
+    },
+    {
+      "id": "scheduled-fuc001",
+      "pacienteId": "p001",
+      "agenteId": "2",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2025-11-24",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "ct-enroll-p006",
+      "pacienteId": "p006",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-12-01",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "15:45",
+      "horaFin": "16:20"
     },
     {
       "id": "fuc002",
       "pacienteId": "p001",
       "agenteId": "2",
-      "fecha": "2025-12-05",
-      "horaInicio": "09:30",
-      "horaFin": "09:50",
+      "origen": "seguimiento",
       "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2025-12-05",
       "motivos": [
         "tratamiento"
       ],
@@ -792,34 +980,45 @@
         "situacionTratamiento",
         "fecha1erTratamiento"
       ],
-      "proximaLlamada": "2026-01-10"
+      "horaInicio": "09:30",
+      "horaFin": "09:50"
     },
     {
-      "id": "fuc003",
-      "pacienteId": "p002",
+      "id": "scheduled-fuc002",
+      "pacienteId": "p001",
       "agenteId": "2",
-      "fecha": "2025-09-22",
-      "horaInicio": "11:00",
-      "horaFin": "11:20",
+      "origen": "seguimiento",
       "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-01-10",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "ct-enroll-p004",
+      "pacienteId": "p004",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2026-01-20",
       "motivos": [
-        "diagnostico"
+        "otro"
       ],
-      "notas": "Se brindó información sobre FISSAL. Paciente tiene dificultades para movilizarse.",
-      "camposActualizados": [
-        "conoceFissal",
-        "limitacionConsultas"
-      ],
-      "proximaLlamada": "2025-10-06"
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "08:15",
+      "horaFin": "08:55"
     },
     {
       "id": "fuc004",
       "pacienteId": "p004",
       "agenteId": "2",
-      "fecha": "2026-01-25",
-      "horaInicio": "14:00",
-      "horaFin": "14:30",
+      "origen": "seguimiento",
       "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2026-01-25",
       "motivos": [
         "afiliacion_sis",
         "tratamiento"
@@ -829,16 +1028,29 @@
         "afiliacionSisDesdeSepa",
         "fecha1erTratamiento"
       ],
-      "proximaLlamada": "2026-02-08"
+      "horaInicio": "14:00",
+      "horaFin": "14:30"
+    },
+    {
+      "id": "scheduled-fuc004",
+      "pacienteId": "p004",
+      "agenteId": "2",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-02-08",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
     },
     {
       "id": "fuc005",
       "pacienteId": "p004",
       "agenteId": "2",
-      "fecha": "2026-02-15",
-      "horaInicio": "10:00",
-      "horaFin": "10:20",
+      "origen": "seguimiento",
       "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2026-02-15",
       "motivos": [
         "evolucion"
       ],
@@ -847,82 +1059,253 @@
         "evolucionEnfermedad",
         "detalleEvolucion"
       ],
-      "proximaLlamada": "2026-03-28"
+      "horaInicio": "10:00",
+      "horaFin": "10:20"
+    },
+    {
+      "id": "ct-enroll-b4f7",
+      "pacienteId": "b4f7",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2026-03-19",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "22:15",
+      "horaFin": "15:05"
+    },
+    {
+      "id": "ct-enroll-f7ae",
+      "pacienteId": "f7ae",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2026-03-19",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "15:43",
+      "horaFin": "18:16"
+    },
+    {
+      "id": "ct-enroll-1837",
+      "pacienteId": "1837",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2026-03-20",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "21:30",
+      "horaFin": "21:34"
+    },
+    {
+      "id": "ct-enroll-9bc8",
+      "pacienteId": "9bc8",
+      "agenteId": "system-enrollment",
+      "origen": "enrolamiento",
+      "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2026-03-20",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Contacto inicial de enrolamiento en programa SEPA",
+      "camposActualizados": [],
+      "horaInicio": "08:38",
+      "horaFin": "09:02"
     },
     {
       "id": "fuc1773974215990",
       "pacienteId": "1837",
       "agenteId": "1",
-      "fecha": "2026-03-20",
-      "horaInicio": "21:35",
-      "horaFin": "21:36",
+      "origen": "seguimiento",
       "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2026-03-20",
       "motivos": [
         "diagnostico"
       ],
       "notas": "Te hicieron un diagnostico de cancer, leucemia. Indicamos que tiene que ir a hacerse un chequeo y que lo hara en la proxima semana.",
       "camposActualizados": [],
-      "proximaLlamada": "2026-03-26"
+      "horaInicio": "21:35",
+      "horaFin": "21:36"
     },
     {
       "id": "fuc1773977887093",
       "pacienteId": "b4f7",
       "agenteId": "1",
-      "fecha": "2026-03-20",
-      "horaInicio": "22:36",
-      "horaFin": "22:37",
+      "origen": "seguimiento",
       "tipo": "entrante",
+      "estado": "completado",
+      "fecha": "2026-03-20",
       "motivos": [
         "otro"
       ],
       "notas": "Paciente comenta que se registro en el SIS, fue a dar su examen pero no lo pudieron atender.",
       "camposActualizados": [],
-      "proximaLlamada": "2026-03-31"
+      "horaInicio": "22:36",
+      "horaFin": "22:37"
     },
     {
       "id": "fuc1774014315984",
       "pacienteId": "p001",
       "agenteId": "1",
-      "fecha": "2026-03-20",
-      "horaInicio": "08:44",
-      "horaFin": "09:22",
+      "origen": "seguimiento",
       "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2026-03-20",
       "motivos": [
         "afiliacion_sis"
       ],
       "notas": "Usuario se afilio al SIS",
       "camposActualizados": [],
-      "proximaLlamada": "2026-03-23"
+      "horaInicio": "08:44",
+      "horaFin": "09:22"
     },
     {
       "id": "fuc1774014424009",
       "pacienteId": "f7ae",
       "agenteId": "1",
-      "fecha": "2026-03-20",
-      "horaInicio": "08:46",
-      "horaFin": "10:00",
+      "origen": "seguimiento",
       "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2026-03-20",
       "motivos": [
         "consulta_medica"
       ],
       "notas": "Paciente fue hacer su consulta medica en ESSALUD",
       "camposActualizados": [],
-      "proximaLlamada": "2026-03-25"
+      "horaInicio": "08:46",
+      "horaFin": "10:00"
     },
     {
       "id": "fuc1774016001692",
       "pacienteId": "9bc8",
       "agenteId": "1",
-      "fecha": "2026-03-20",
-      "horaInicio": "09:12",
-      "horaFin": "09:40",
+      "origen": "seguimiento",
       "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2026-03-20",
       "motivos": [
         "consulta_medica"
       ],
       "notas": "Diagnosticaorn que tiene cancer estadio 3",
       "camposActualizados": [],
-      "proximaLlamada": "2026-03-30"
+      "horaInicio": "09:12",
+      "horaFin": "09:40"
+    },
+    {
+      "id": "scheduled-fuc1774014315984",
+      "pacienteId": "p001",
+      "agenteId": "1",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-03-23",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "scheduled-fuc1774014424009",
+      "pacienteId": "f7ae",
+      "agenteId": "1",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-03-25",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "scheduled-fuc1773974215990",
+      "pacienteId": "1837",
+      "agenteId": "1",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-03-26",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "scheduled-fuc005",
+      "pacienteId": "p004",
+      "agenteId": "2",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-03-28",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "scheduled-fuc1774016001692",
+      "pacienteId": "9bc8",
+      "agenteId": "1",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-03-30",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "scheduled-fuc1773977887093",
+      "pacienteId": "b4f7",
+      "agenteId": "1",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-03-31",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
+    },
+    {
+      "id": "ct1776693111767-main",
+      "pacienteId": "p004",
+      "agenteId": "2",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "completado",
+      "fecha": "2026-04-20",
+      "horaInicio": "08:51",
+      "horaFin": "09:31",
+      "motivos": [
+        "otro"
+      ],
+      "notas": "Este es un contacto de prueba",
+      "camposActualizados": []
+    },
+    {
+      "id": "ct1776693111767-next",
+      "pacienteId": "p004",
+      "agenteId": "2",
+      "origen": "seguimiento",
+      "tipo": "saliente",
+      "estado": "agendado",
+      "fecha": "2026-04-24",
+      "horaInicio": "09:00",
+      "motivos": [],
+      "notas": "Contacto de seguimiento agendado",
+      "camposActualizados": []
     }
   ],
   "psicoSessions": [
@@ -1665,6 +2048,11 @@
     {
       "id": "h1773974006747",
       "nombre": "HOSPITAL REBAGLIATI",
+      "ciudad": "Lima"
+    },
+    {
+      "id": "h1776459950149",
+      "nombre": "HOSPITAL 2 DE MAYO",
       "ciudad": "Lima"
     }
   ],

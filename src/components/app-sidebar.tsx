@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { Plus } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -10,8 +11,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarSeparator,
 } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import { navConfig } from "@/lib/navigation"
@@ -45,6 +46,18 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
+        {role !== "voluntario" && (
+          <div className="px-2 pt-2">
+            <Button
+              render={<Link href="/inscripcion" />}
+              className="w-full justify-center gap-2 rounded-md bg-red-600 text-white hover:bg-red-700"
+              size="sm"
+            >
+              <Plus className="size-4" />
+              Enrolamiento
+            </Button>
+          </div>
+        )}
         <NavMain groups={groups} />
       </SidebarContent>
 

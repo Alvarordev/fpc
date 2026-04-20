@@ -20,6 +20,14 @@ interface NavMainProps {
 export function NavMain({ groups }: NavMainProps) {
   const pathname = usePathname()
 
+  function isItemActive(url: string): boolean {
+    if (url === "/pacientes") {
+      return pathname === "/pacientes" || pathname.startsWith("/pacientes/")
+    }
+
+    return pathname === url
+  }
+
   return (
     <>
       {groups.map((group) => (
@@ -28,7 +36,7 @@ export function NavMain({ groups }: NavMainProps) {
           <SidebarGroupContent>
             <SidebarMenu>
               {group.items.map((item) => {
-                const isActive = pathname === item.url
+                const isActive = isItemActive(item.url)
                 return (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton

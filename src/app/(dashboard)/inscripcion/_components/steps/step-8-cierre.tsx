@@ -20,6 +20,8 @@ import { SectionHeader } from '../section-header'
 import { StepNav } from '../step-nav'
 import { useMutation } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
+import { API_URL } from '@/lib/auth'
+import { useAuthStore } from '@/store/auth-store'
 
 const schema = z.object({
   q132_encuestaAceptada: z.string().min(1, 'Seleccione una opción'),
@@ -135,9 +137,15 @@ function inferPayload(data: Partial<EnrollmentFormData>) {
   }
 }
 
-async function submitEnrollment(data: Partial<EnrollmentFormData>) {
+async function submitEnrollment({
+  data,
+  agenteId,
+}: {
+  data: Partial<EnrollmentFormData>
+  agenteId: string
+}) {
   const inferredData = inferPayload(data)
-  const res = await fetch('http://localhost:3001/patients', {
+  const patientRes = await fetch(`${API_URL}/patients`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -146,8 +154,35 @@ async function submitEnrollment(data: Partial<EnrollmentFormData>) {
       estado: 'activo',
     }),
   })
-  if (!res.ok) throw new Error('Error al guardar')
-  return res.json()
+  if (!patientRes.ok) throw new Error('Error al guardar')
+
+  const patient = await patientRes.json()
+
+  const start = inferredData.q2_horaInicio ?? ''
+  const end = inferredData.q133_horaFin ?? ''
+
+  const contactRes = await fetch(`${API_URL}/contacts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: `ct-enroll-${Date.now()}`,
+      pacienteId: String(patient.id),
+      agenteId,
+      origen: 'enrolamiento',
+      tipo: 'entrante',
+      estado: 'completado',
+      fecha: (patient.fechaCreacion ?? new Date().toISOString()).slice(0, 10),
+      horaInicio: start,
+      horaFin: end,
+      motivos: ['otro'],
+      notas: 'Contacto inicial de enrolamiento en programa SEPA',
+      camposActualizados: [],
+    }),
+  })
+
+  if (!contactRes.ok) throw new Error('Paciente creado sin contacto inicial')
+
+  return patient
 }
 
 export function Step8Cierre() {
@@ -160,6 +195,7 @@ export function Step8Cierre() {
     isComplete,
   } = useEnrollmentStore()
   const partial = formData as Partial<EnrollmentFormData>
+  const user = useAuthStore((s) => s.user)
   const now = new Date().toTimeString().slice(0, 5)
 
   const {
@@ -182,7 +218,10 @@ export function Step8Cierre() {
 
   const onSubmit = (values: FormValues) => {
     saveStepData(values)
-    mutation.mutate({ ...partial, ...values })
+    mutation.mutate({
+      data: { ...partial, ...values },
+      agenteId: String(user?.id ?? 'system-enrollment'),
+    })
   }
 
   if (isComplete) {

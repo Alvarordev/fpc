@@ -129,10 +129,7 @@ export function PatientDetailContent({ id }: PatientDetailContentProps) {
         </TabsContent>
 
         <TabsContent value="seguimiento">
-          <SeguimientoTab
-            pacienteId={id}
-            fechaCreacion={patient.fechaCreacion}
-          />
+          <SeguimientoTab pacienteId={id} fechaCreacion={patient.fechaCreacion} />
         </TabsContent>
 
         <TabsContent value="psicooncologia">

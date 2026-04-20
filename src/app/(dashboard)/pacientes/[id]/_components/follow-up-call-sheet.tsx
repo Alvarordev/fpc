@@ -24,9 +24,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { MOTIVOS_CONFIG } from "@/types/follow-up"
+import { MOTIVOS_CONFIG } from "@/types/contact"
 import { useAuthStore } from "@/store/auth-store"
-import { useCreateFollowUpCall } from "../_hooks/use-follow-up"
+import { useCreateContact } from "../_hooks/use-follow-up"
 import { usePsicoSessions, useVolunteers, useAvailableSlots, useCreatePsicoSession } from "../_hooks/use-psico-sessions"
 import { HospitalSelect } from "@/components/hospital-select"
 import { useHospitals, useCreateHospitalAlert } from "@/hooks/use-hospitals"
@@ -34,12 +34,22 @@ import type { AvailabilitySlot } from "@/types/volunteer"
 
 const schema = z.object({
   tipo: z.enum(["saliente", "entrante"]),
+  estado: z.enum(["completado", "inconcluso"]),
   fecha: z.string().min(1, "Fecha requerida"),
   horaInicio: z.string().min(1, "Hora de inicio requerida"),
   horaFin: z.string().min(1, "Hora de fin requerida"),
   motivos: z.array(z.string()).min(1, "Seleccione al menos un motivo"),
   notas: z.string(),
   proximaLlamada: z.string().optional(),
+  motivoInconcluso: z.string().optional(),
+}).superRefine((values, ctx) => {
+  if (values.estado === "inconcluso" && !values.motivoInconcluso?.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["motivoInconcluso"],
+      message: "Ingrese el motivo del contacto inconcluso",
+    })
+  }
 })
 
 type FormValues = z.infer<typeof schema>
@@ -65,7 +75,7 @@ interface FollowUpCallSheetProps {
 
 export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCallSheetProps) {
   const user = useAuthStore((s) => s.user)
-  const createCall = useCreateFollowUpCall(pacienteId)
+  const createContact = useCreateContact(pacienteId)
 
   const { data: hospitals = [] } = useHospitals()
   const createAlert = useCreateHospitalAlert()
@@ -101,16 +111,19 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
     resolver: zodResolver(schema),
     defaultValues: {
       tipo: "saliente",
+      estado: "completado",
       fecha: todayISO(),
       horaInicio: "",
       horaFin: "",
       motivos: [],
       notas: "",
       proximaLlamada: "",
+      motivoInconcluso: "",
     },
   })
 
   const selectedMotivos = watch("motivos")
+  const selectedStatus = watch("estado")
 
   function toggleMotivo(key: string) {
     const current = selectedMotivos
@@ -122,7 +135,7 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
   }
 
   function resetAll() {
-    reset({ tipo: "saliente", fecha: todayISO(), horaInicio: "", horaFin: "", motivos: [], notas: "", proximaLlamada: "" })
+    reset({ tipo: "saliente", estado: "completado", fecha: todayISO(), horaInicio: "", horaFin: "", motivos: [], notas: "", proximaLlamada: "", motivoInconcluso: "" })
     setAlertOpen(false)
     setAlertHospital("")
     setAlertDetalle("")
@@ -133,19 +146,40 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
   }
 
   async function onSubmit(values: FormValues) {
-    await createCall.mutateAsync({
-      id: `fuc${Date.now()}`,
+    const baseId = `ct${Date.now()}`
+
+    await createContact.mutateAsync({
+      id: `${baseId}-main`,
       pacienteId,
       agenteId: String(user?.id ?? ""),
+      origen: "seguimiento",
       fecha: values.fecha,
       horaInicio: values.horaInicio,
       horaFin: values.horaFin,
       tipo: values.tipo,
+      estado: values.estado,
       motivos: values.motivos,
       notas: values.notas,
       camposActualizados: [],
-      ...(values.proximaLlamada ? { proximaLlamada: values.proximaLlamada } : {}),
+      ...(values.estado === "inconcluso" && values.motivoInconcluso?.trim()
+        ? { motivoInconcluso: values.motivoInconcluso.trim() }
+        : {}),
     })
+
+    if (values.proximaLlamada) {
+      await createContact.mutateAsync({
+        id: `${baseId}-next`,
+        pacienteId,
+        agenteId: String(user?.id ?? ""),
+        origen: "seguimiento",
+        fecha: values.proximaLlamada,
+        tipo: "saliente",
+        estado: "agendado",
+        motivos: [],
+        notas: "Contacto de seguimiento agendado",
+        camposActualizados: [],
+      })
+    }
 
     if (alertOpen && alertHospital && alertDetalle.trim()) {
       const hospital = hospitals.find((h) => h.nombre === alertHospital)
@@ -195,14 +229,14 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent side="right" className="flex flex-col gap-0 p-0 sm:max-w-md">
-        <SheetHeader className="border-b border-border/60">
-          <SheetTitle>Registrar llamada de seguimiento</SheetTitle>
-        </SheetHeader>
+          <SheetHeader className="border-b border-border/60">
+          <SheetTitle>Registrar contacto de seguimiento</SheetTitle>
+          </SheetHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-y-auto">
           <div className="flex-1 space-y-5 p-6">
             <div className="space-y-1.5">
-              <Label className="text-sm">Tipo de llamada</Label>
+              <Label className="text-sm">Tipo de contacto</Label>
               <Controller
                 name="tipo"
                 control={control}
@@ -212,8 +246,27 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="saliente">Llamada saliente (del agente al paciente)</SelectItem>
-                      <SelectItem value="entrante">Llamada entrante (del paciente al agente)</SelectItem>
+                      <SelectItem value="saliente">Contacto saliente (del agente al paciente)</SelectItem>
+                      <SelectItem value="entrante">Contacto entrante (del paciente al agente)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm">Estado del contacto</Label>
+              <Controller
+                name="estado"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="completado">Completado</SelectItem>
+                      <SelectItem value="inconcluso">Inconcluso</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -261,6 +314,20 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
               {errors.motivos && <p className="text-xs text-destructive">{errors.motivos.message}</p>}
             </div>
 
+            {selectedStatus === "inconcluso" && (
+              <div className="space-y-1.5">
+                <Label className="text-sm">Motivo de inconcluso</Label>
+                <Textarea
+                  {...register("motivoInconcluso")}
+                  placeholder="Ej: no contestó, llamada cortada, paciente solicitó reprogramar..."
+                  className="min-h-20 text-sm resize-none"
+                />
+                {errors.motivoInconcluso && (
+                  <p className="text-xs text-destructive">{errors.motivoInconcluso.message}</p>
+                )}
+              </div>
+            )}
+
             <div className="space-y-1.5">
               <Label className="text-sm">Notas</Label>
               <Textarea
@@ -277,13 +344,13 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
               </Label>
               <Input type="date" {...register("proximaLlamada")} className="h-9" />
               <p className="text-xs text-muted-foreground">
-                Si acordó una próxima comunicación, indique la fecha aquí.
+                Se registrará como un nuevo contacto agendado para el historial.
               </p>
             </div>
 
             <div className="space-y-2 pt-2 border-t border-border/60">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Acciones durante la llamada
+                Acciones durante el contacto
               </p>
 
               <div className="rounded-xl border bg-card overflow-hidden">
@@ -429,7 +496,7 @@ export function FollowUpCallSheet({ open, onOpenChange, pacienteId }: FollowUpCa
 
           <SheetFooter className="border-t border-border/60">
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Registrando..." : "Registrar llamada"}
+              {isSubmitting ? "Registrando..." : "Registrar contacto"}
             </Button>
           </SheetFooter>
         </form>

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { UserPlus, Phone, PhoneIncoming, Brain, ChevronDown, ChevronUp, Calendar, TriangleAlert } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { MOTIVOS_CONFIG, type TimelineEvent } from "@/types/follow-up"
+import { MOTIVOS_CONFIG, type TimelineEvent, type ContactStatus } from "@/types/contact"
 import { PROFILE_SECTIONS } from "@/types/patient"
 
 const fieldLabelMap: Record<string, string> = Object.fromEntries(
@@ -56,6 +56,12 @@ const psicoEstadoConfig: Record<string, { label: string; className: string }> = 
   no_contesto: { label: "No contestó", className: "bg-amber-50 text-amber-700 border-amber-200" },
 }
 
+const contactStatusConfig: Record<ContactStatus, { label: string; className: string }> = {
+  completado: { label: "Completado", className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  agendado: { label: "Agendado", className: "bg-amber-50 text-amber-700 border-amber-200" },
+  inconcluso: { label: "Inconcluso", className: "bg-zinc-100 text-zinc-700 border-zinc-200" },
+}
+
 function formatDate(fecha: string): string {
   return new Date(fecha + "T12:00:00").toLocaleDateString("es-PE", {
     weekday: "long",
@@ -89,8 +95,12 @@ interface TimelineEventCardProps {
 export function TimelineEventCard({ event, isLast }: TimelineEventCardProps) {
   const [expanded, setExpanded] = useState(false)
 
-  const tipo = event.type === "llamada"
-    ? (event.meta?.tipo === "entrante" ? "llamada_entrante" : "llamada_saliente")
+  const tipo = event.type === "contacto"
+    ? (event.meta?.origen === "enrolamiento"
+      ? "inscripcion"
+      : event.meta?.tipo === "entrante"
+        ? "llamada_entrante"
+        : "llamada_saliente")
     : event.type as keyof typeof typeConfig
 
   const config = typeConfig[tipo as keyof typeof typeConfig]
@@ -102,8 +112,12 @@ export function TimelineEventCard({ event, isLast }: TimelineEventCardProps) {
   const horaInicio = event.meta?.horaInicio as string | undefined
   const horaFin = event.meta?.horaFin as string | undefined
   const psicoEstado = event.meta?.estado as string | undefined
+  const contactStatus = event.type === "contacto"
+    ? (event.meta?.estado as ContactStatus | undefined)
+    : undefined
+  const motivoInconcluso = event.meta?.motivoInconcluso as string | undefined
 
-  const hasDetails = event.description || motivos.length > 0 || camposActualizados.length > 0 || proximaLlamada
+  const hasDetails = event.description || motivos.length > 0 || camposActualizados.length > 0 || proximaLlamada || motivoInconcluso
 
   return (
     <div className="flex gap-4">
@@ -140,6 +154,17 @@ export function TimelineEventCard({ event, isLast }: TimelineEventCardProps) {
                 )}
               >
                 {psicoEstadoConfig[psicoEstado].label}
+              </Badge>
+            )}
+
+            {contactStatus && contactStatusConfig[contactStatus] && (
+              <Badge
+                className={cn(
+                  "border text-xs font-medium shrink-0",
+                  contactStatusConfig[contactStatus].className
+                )}
+              >
+                {contactStatusConfig[contactStatus].label}
               </Badge>
             )}
           </div>
@@ -193,7 +218,18 @@ export function TimelineEventCard({ event, isLast }: TimelineEventCardProps) {
               {proximaLlamada && (
                 <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                   <Calendar className="size-3.5 shrink-0" />
-                  <span>Próxima llamada agendada: <strong>{formatShortDate(proximaLlamada)}</strong></span>
+                  <span>
+                    Próximo contacto agendado: <strong>{formatShortDate(proximaLlamada)}</strong>
+                    {horaInicio ? <strong>{` · ${horaInicio}`}</strong> : null}
+                  </span>
+                </div>
+              )}
+
+              {motivoInconcluso && (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2">
+                  <p className="text-xs text-zinc-700">
+                    Motivo inconcluso: <strong>{motivoInconcluso}</strong>
+                  </p>
                 </div>
               )}
             </div>

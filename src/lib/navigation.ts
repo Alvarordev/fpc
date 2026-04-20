@@ -1,8 +1,6 @@
 import {
   LayoutDashboard,
   Users,
-  Phone,
-  BarChart3,
   CalendarDays,
   Clock,
   UserCheck,
@@ -24,15 +22,8 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
     {
       label: "Seguimiento",
       items: [
-        { title: "Llamadas", url: "/llamadas", icon: Phone },
         { title: "Alertas", url: "/alertas", icon: TriangleAlert },
         { title: "Hospitales", url: "/hospitales", icon: Building2 },
-      ],
-    },
-    {
-      label: "Análisis",
-      items: [
-        { title: "Mis Métricas", url: "/metricas", icon: BarChart3 },
       ],
     },
   ],
@@ -86,8 +77,6 @@ export const pathTitles: Record<string, string> = {
   "/": "Dashboard",
   "/pacientes": "Pacientes",
   "/inscripcion": "Inscripción",
-  "/llamadas": "Llamadas y Seguimiento",
-  "/metricas": "Mis Métricas",
   "/agenda": "Mi Agenda",
   "/disponibilidad": "Disponibilidad",
   "/voluntarios": "Voluntarios",

@@ -65,6 +65,14 @@ Shared chrome components in `src/components/`:
 
 Navigation config: `src/lib/navigation.ts` exports `navConfig: Record<UserRole, NavItem[]>` and `pathTitles` map. Types in `src/types/navigation.ts`.
 
+### Navigation rules
+
+- Do not include **"Llamadas"** or **"Mis Métricas"** as sidebar navigation items.
+- For detail routes, the topbar must render navigable breadcrumbs:
+  - `pacientes/[id]` → `Pacientes / <Paciente>`
+  - `pacientes/[id]/contacto` → `Pacientes / <Paciente> / Nuevo contacto`
+  - `hospitales/[id]` → `Hospitales / <Hospital>`
+
 **shadcn/ui note:** This project uses the `base-maia` style backed by **Base UI** primitives, not Radix. Use `render={<element />}` prop instead of `asChild`. Icon library is **hugeicons** (`@hugeicons/react`) for shadcn components, but `lucide-react` is used in custom components.
 
 ## Auth

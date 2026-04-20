@@ -1,23 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
 import { UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PatientsToolbar } from "./patients-toolbar"
 import { PatientsTable } from "./patients-table"
 import { VolunteerPatientsContent } from "./volunteer-patients-content"
 import { patientColumns } from "../_utils/patient-columns"
-import { type Patient, type PatientStatus } from "../_utils/patient-data"
-import { API_URL } from "@/lib/auth"
+import { type PatientStatus } from "../_utils/patient-data"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/store/auth-store"
-
-async function fetchPatients(): Promise<Patient[]> {
-  const res = await fetch(`${API_URL}/patients`)
-  if (!res.ok) throw new Error("Error al cargar pacientes")
-  return res.json()
-}
+import { usePatients } from "@/hooks/use-patients"
 
 export function PatientsContent() {
   const [search, setSearch] = useState("")
@@ -25,12 +18,9 @@ export function PatientsContent() {
   const router = useRouter()
   const role = useAuthStore((s) => s.user?.role)
 
-  if (role === "voluntario") return <VolunteerPatientsContent />
+  const { data: patients = [] } = usePatients({ enabled: role !== "voluntario" })
 
-  const { data: patients = [] } = useQuery({
-    queryKey: ["patients"],
-    queryFn: fetchPatients,
-  })
+  if (role === "voluntario") return <VolunteerPatientsContent />
 
   const filtered = patients.filter((p) => {
     const matchesSearch =

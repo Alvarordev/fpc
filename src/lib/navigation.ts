@@ -1,13 +1,13 @@
 import {
   LayoutDashboard,
   Users,
-  ClipboardList,
   Phone,
   BarChart3,
   CalendarDays,
   Clock,
   UserCheck,
   TriangleAlert,
+  Building2,
 } from "lucide-react"
 import type { NavGroup } from "@/types/navigation"
 import type { UserRole } from "@/types/auth"
@@ -19,7 +19,6 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
       items: [
         { title: "Dashboard", url: "/", icon: LayoutDashboard },
         { title: "Pacientes", url: "/pacientes", icon: Users },
-        { title: "Inscripción", url: "/inscripcion", icon: ClipboardList, highlight: true },
       ],
     },
     {
@@ -27,6 +26,7 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
       items: [
         { title: "Llamadas", url: "/llamadas", icon: Phone },
         { title: "Alertas", url: "/alertas", icon: TriangleAlert },
+        { title: "Hospitales", url: "/hospitales", icon: Building2 },
       ],
     },
     {
@@ -59,6 +59,7 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
       label: "Operaciones",
       items: [
         { title: "Alertas", url: "/alertas", icon: TriangleAlert },
+        { title: "Hospitales", url: "/hospitales", icon: Building2 },
       ],
     },
   ],
@@ -75,6 +76,7 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
       label: "Operaciones",
       items: [
         { title: "Alertas", url: "/alertas", icon: TriangleAlert },
+        { title: "Hospitales", url: "/hospitales", icon: Building2 },
       ],
     },
   ],
@@ -89,5 +91,6 @@ export const pathTitles: Record<string, string> = {
   "/agenda": "Mi Agenda",
   "/disponibilidad": "Disponibilidad",
   "/voluntarios": "Voluntarios",
-  "/alertas": "Alertas y Hospitales",
+  "/alertas": "Alertas",
+  "/hospitales": "Hospitales",
 }

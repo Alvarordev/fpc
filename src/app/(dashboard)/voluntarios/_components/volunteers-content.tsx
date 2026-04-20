@@ -11,6 +11,7 @@ import { VolunteersTable } from "./volunteers-table"
 import { getVolunteerColumns } from "../_utils/volunteer-columns"
 import type { Volunteer, AvailabilitySlot } from "@/types/volunteer"
 import { API_URL } from "@/lib/auth"
+import { useAuthStore } from "@/store/auth-store"
 
 type VolunteerStatus = Volunteer["estado"]
 
@@ -29,6 +30,9 @@ async function fetchSlots(): Promise<AvailabilitySlot[]> {
 }
 
 export function VolunteersContent() {
+  const role = useAuthStore((s) => s.user?.role)
+  const isReadOnly = role === "callcenter"
+
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<VolunteerStatus | null>(null)
   const [year, setYear] = useState(NOW.getFullYear())
@@ -73,6 +77,11 @@ export function VolunteersContent() {
         <p className="text-sm text-muted-foreground mt-0.5">
           {volunteers.length} voluntarios registrados
         </p>
+        {isReadOnly && (
+          <p className="text-xs text-muted-foreground mt-1">
+            Vista de solo lectura para Call Center.
+          </p>
+        )}
       </div>
 
       <VolunteersToolbar

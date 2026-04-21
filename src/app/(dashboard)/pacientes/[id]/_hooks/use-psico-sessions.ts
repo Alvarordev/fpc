@@ -33,10 +33,21 @@ interface SlotRow {
 }
 
 async function fetchSessions(pacienteId: string): Promise<PsicoSession[]> {
+  // 1. Resolvemos el UUID interno del paciente por su legacy_id
+  const { data: patientRow, error: patientError } = await supabase
+    .from("fpc_patients")
+    .select("id")
+    .eq("legacy_id", pacienteId)
+    .maybeSingle()
+
+  if (patientError) throw new Error("Error al cargar sesiones")
+  if (!patientRow) return []
+
+  // 2. Filtramos sesiones por patient_id (FK directa, evita dot-notation bug en Supabase)
   const { data, error } = await supabase
     .from("fpc_psico_sessions")
     .select("id, legacy_id, patient:fpc_patients!fpc_psico_sessions_patient_id_fkey(legacy_id), volunteer:fpc_volunteers!fpc_psico_sessions_volunteer_id_fkey(legacy_id), availability_slot:fpc_availability_slots!fpc_psico_sessions_availability_slot_id_fkey(legacy_id), session_number, session_date, start_time, end_time, mode, status, notes, satisfaction, extra_needed")
-    .eq("patient.legacy_id", pacienteId)
+    .eq("patient_id", patientRow.id)
 
   if (error) throw new Error("Error al cargar sesiones")
 

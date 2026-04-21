@@ -1,4 +1,4 @@
-import { Phone, UserPlus, Calendar, CheckCircle2, Clock, Users, FileText, AlertCircle } from "lucide-react"
+import { Phone, UserPlus, Calendar, CheckCircle2, AlertCircle, HeartPulse } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import type { UserRole } from "@/types/auth"
@@ -10,7 +10,7 @@ interface ActivityItem {
   accent?: boolean
 }
 
-const activityData: Record<UserRole, ActivityItem[]> = {
+const mockActivityData: Record<UserRole, ActivityItem[]> = {
   callcenter: [
     { icon: Phone, text: "Llamada completada con María Torres", time: "Hace 12 min" },
     { icon: UserPlus, text: "Nueva inscripción: Luis Quispe Mamani", time: "Hace 38 min", accent: true },
@@ -22,35 +22,63 @@ const activityData: Record<UserRole, ActivityItem[]> = {
   voluntario: [
     { icon: CheckCircle2, text: "Visita completada: Pedro Vargas", time: "Hace 1 h" },
     { icon: Calendar, text: "Cita mañana a las 09:00 con Isabel Soto", time: "Hace 2 h" },
-    { icon: FileText, text: "Reporte semanal enviado al equipo", time: "Hace 4 h" },
-    { icon: Users, text: "Nuevo paciente asignado: Roberto Lima", time: "Hace 5 h" },
-    { icon: Clock, text: "Disponibilidad actualizada para próxima semana", time: "Ayer" },
+    { icon: Phone, text: "Reporte semanal enviado al equipo", time: "Hace 4 h" },
+    { icon: UserPlus, text: "Nuevo paciente asignado: Roberto Lima", time: "Hace 5 h" },
+    { icon: Calendar, text: "Disponibilidad actualizada para próxima semana", time: "Ayer" },
     { icon: CheckCircle2, text: "Visita completada: Elena Mendoza", time: "Ayer" },
   ],
   fundacion: [
     { icon: UserPlus, text: "34 inscripciones completadas este mes", time: "Hace 30 min", accent: true },
-    { icon: Users, text: "2 nuevos voluntarios incorporados", time: "Hace 2 h" },
+    { icon: HeartPulse, text: "2 nuevos voluntarios incorporados", time: "Hace 2 h" },
     { icon: Calendar, text: "12 citas programadas para hoy", time: "Hace 3 h" },
-    { icon: FileText, text: "Reporte mensual de actividades generado", time: "Hace 4 h" },
+    { icon: Phone, text: "Reporte mensual de actividades generado", time: "Hace 4 h" },
     { icon: CheckCircle2, text: "Auditoría de datos completada", time: "Ayer" },
     { icon: AlertCircle, text: "3 pacientes requieren seguimiento urgente", time: "Ayer" },
   ],
   admin: [
     { icon: UserPlus, text: "34 inscripciones completadas este mes", time: "Hace 30 min", accent: true },
-    { icon: Users, text: "2 nuevos voluntarios incorporados", time: "Hace 2 h" },
+    { icon: HeartPulse, text: "2 nuevos voluntarios incorporados", time: "Hace 2 h" },
     { icon: Calendar, text: "12 citas programadas para hoy", time: "Hace 3 h" },
-    { icon: FileText, text: "Reporte mensual de actividades generado", time: "Hace 4 h" },
+    { icon: Phone, text: "Reporte mensual de actividades generado", time: "Hace 4 h" },
     { icon: CheckCircle2, text: "Auditoría de datos completada", time: "Ayer" },
     { icon: AlertCircle, text: "3 pacientes requieren seguimiento urgente", time: "Ayer" },
   ],
 }
 
-interface DashboardRecentActivityProps {
-  role: UserRole
+interface RecentActivityItem {
+  id: string
+  type: 'contact' | 'patient' | 'alert'
+  title: string
+  description: string
+  fecha: string
+  accent?: boolean
 }
 
-export function DashboardRecentActivity({ role }: DashboardRecentActivityProps) {
-  const items = activityData[role]
+interface DashboardRecentActivityProps {
+  role: UserRole
+  activity?: RecentActivityItem[]
+}
+
+export function DashboardRecentActivity({ role, activity }: DashboardRecentActivityProps) {
+  let items: ActivityItem[]
+
+  if (activity && activity.length > 0) {
+    items = activity.map((a) => {
+      const iconMap: Record<string, React.ElementType> = {
+        contact: Phone,
+        patient: UserPlus,
+        alert: AlertCircle,
+      }
+      return {
+        icon: iconMap[a.type] ?? CheckCircle2,
+        text: `${a.title}${a.description ? ` — ${a.description}` : ''}`,
+        time: a.fecha,
+        accent: a.accent,
+      }
+    })
+  } else {
+    items = mockActivityData[role]
+  }
 
   return (
     <Card className="border-border/60 shadow-none bg-card">

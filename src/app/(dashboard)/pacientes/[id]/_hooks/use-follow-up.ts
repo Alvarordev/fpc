@@ -9,6 +9,7 @@ import type { Contact, TimelineEvent } from "@/types/contact"
 interface ContactRow {
   id: string
   legacy_id: string | null
+  patient?: { legacy_id?: string | null } | null
   created_by?: { id?: string | null } | null
   origin: Contact["origen"]
   direction: Contact["tipo"]
@@ -43,6 +44,17 @@ function normalizeContact(raw: Partial<Contact>): Contact {
 }
 
 async function fetchContacts(pacienteId: string): Promise<Contact[]> {
+  // 1. Resolvemos el UUID interno del paciente por su legacy_id
+  const { data: patientRow, error: patientError } = await supabase
+    .from("fpc_patients")
+    .select("id")
+    .eq("legacy_id", pacienteId)
+    .maybeSingle()
+
+  if (patientError) throw new Error("Error al cargar contactos")
+  if (!patientRow) return []
+
+  // 2. Filtramos contactos por patient_id (FK directa, evita dot-notation bug en Supabase)
   const { data: rows, error } = await supabase
     .from("fpc_contacts")
     .select(`
@@ -61,7 +73,7 @@ async function fetchContacts(pacienteId: string): Promise<Contact[]> {
       inconclusive_reason,
       fpc_contact_motives(motive_code)
     `)
-    .eq("patient.legacy_id", pacienteId)
+    .eq("patient_id", patientRow.id)
 
   if (error) throw new Error("Error al cargar contactos")
 
@@ -90,6 +102,60 @@ export function useContacts(pacienteId: string) {
   return useQuery({
     queryKey: ["contacts", pacienteId],
     queryFn: () => fetchContacts(pacienteId),
+  })
+}
+
+async function fetchContact(id: string): Promise<Contact> {
+  const { data: rows, error } = await supabase
+    .from("fpc_contacts")
+    .select(`
+      id,
+      legacy_id,
+      patient:fpc_patients!fpc_contacts_patient_id_fkey(legacy_id),
+      created_by:fpc_users!fpc_contacts_created_by_user_id_fkey(id),
+      origin,
+      direction,
+      status,
+      contact_date,
+      start_time,
+      end_time,
+      notes,
+      updated_fields,
+      inconclusive_reason,
+      fpc_contact_motives(motive_code)
+    `)
+    .eq("legacy_id", id)
+    .limit(1)
+
+  if (error) throw new Error("Error al cargar contacto")
+
+  const row = (rows?.[0] ?? null) as ContactRow | null
+  if (!row) throw new Error("Contacto no encontrado")
+
+  return normalizeContact({
+    id: String(row.legacy_id ?? row.id),
+    pacienteId: String(row.patient?.legacy_id ?? ""),
+    agenteId: row.created_by?.id ? String(row.created_by.id) : "",
+    origen: row.origin,
+    tipo: row.direction,
+    estado: row.status,
+    fecha: row.contact_date,
+    horaInicio: row.start_time?.slice(0, 5),
+    horaFin: row.end_time?.slice(0, 5),
+    motivos: Array.isArray(row.fpc_contact_motives)
+      ? row.fpc_contact_motives.map((m) => String(m.motive_code))
+      : [],
+    notas: row.notes ?? "",
+    camposActualizados: Array.isArray(row.updated_fields) ? row.updated_fields : [],
+    motivoInconcluso: row.inconclusive_reason ?? undefined,
+  })
+}
+
+export function useContact(id: string) {
+  return useQuery({
+    queryKey: ["contact", id],
+    queryFn: () => fetchContact(id),
+    enabled: Boolean(id),
   })
 }
 

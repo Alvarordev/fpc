@@ -41,11 +41,14 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // 1. Crear usuario en auth.users con email confirmado
+  const fullName = `${nombre} ${apellido}`
+
+  // 1. Crear usuario en auth.users con email confirmado y metadata para el trigger
   const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
+    user_metadata: { name: fullName },
   })
 
   if (authError || !authData.user) {
@@ -57,20 +60,17 @@ export async function POST(request: NextRequest) {
 
   const userId = authData.user.id
 
-  // 2. Insertar en fpc_users
-  const { error: profileError } = await supabaseAdmin.from("fpc_users").insert({
-    id: userId,
-    email,
-    full_name: `${nombre} ${apellido}`,
-    role,
-    is_active: true,
-  })
+  // 2. Actualizar fpc_users (el trigger ya insertó la fila básica)
+  const { error: profileError } = await supabaseAdmin
+    .from("fpc_users")
+    .update({ full_name: fullName, role, is_active: true })
+    .eq("id", userId)
 
   if (profileError) {
     // Rollback: eliminar usuario de auth
     await supabaseAdmin.auth.admin.deleteUser(userId)
     return NextResponse.json(
-      { error: profileError.message ?? "Error al crear perfil de usuario" },
+      { error: profileError.message ?? "Error al actualizar perfil de usuario" },
       { status: 500 }
     )
   }

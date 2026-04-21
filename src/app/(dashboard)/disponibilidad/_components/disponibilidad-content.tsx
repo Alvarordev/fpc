@@ -21,6 +21,10 @@ export function DisponibilidadContent() {
   const [month, setMonth] = useState(CURRENT_MONTH)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined)
+  const [selectedWeekday, setSelectedWeekday] = useState<number | undefined>(undefined)
+  const [anchorPosition, setAnchorPosition] = useState<
+    { x: number; y: number; side: "left" | "right" } | undefined
+  >(undefined)
 
   const { data: slots = [] } = useMySlots(voluntarioId || undefined)
   const deleteSlot = useDeleteSlot(voluntarioId)
@@ -38,13 +42,25 @@ export function DisponibilidadContent() {
     else setMonth(m => m + 1)
   }
 
-  function handleDayClick(date: Date) {
+  function handleDayClick(date: Date, anchor: HTMLElement) {
+    const rect = anchor.getBoundingClientRect()
+    const dialogWidth = 360
+    const dialogHeight = 420
+    const gap = 8
+    const side = rect.right + dialogWidth + gap > window.innerWidth ? "left" : "right"
+    const x = side === "right" ? rect.right + gap : Math.max(8, rect.left - dialogWidth - gap)
+    const y = Math.max(8, Math.min(rect.top, window.innerHeight - dialogHeight - 8))
+
+    setAnchorPosition({ x, y, side })
     setSelectedDate(date.toISOString().slice(0, 10))
+    setSelectedWeekday(date.getDay())
     setSheetOpen(true)
   }
 
   function handleAddClick() {
+    setAnchorPosition(undefined)
     setSelectedDate(undefined)
+    setSelectedWeekday(undefined)
     setSheetOpen(true)
   }
 
@@ -102,6 +118,8 @@ export function DisponibilidadContent() {
         onOpenChange={setSheetOpen}
         voluntarioId={voluntarioId}
         defaultDate={selectedDate}
+        selectedWeekday={selectedWeekday}
+        anchorPosition={anchorPosition}
       />
     </div>
   )

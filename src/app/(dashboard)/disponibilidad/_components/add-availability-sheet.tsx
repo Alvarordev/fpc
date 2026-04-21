@@ -187,13 +187,23 @@ function SheetForm({ voluntarioId, defaultDate, selectedWeekday, onClose, side =
               )}
             </div>
           </div>
-          <Button
-            className="w-full"
-            onClick={singleForm.handleSubmit(onSingleSubmit)}
-            disabled={createSlot.isPending}
-          >
-            {createSlot.isPending ? "Guardando..." : "Guardar"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={onClose}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="flex-1"
+              onClick={singleForm.handleSubmit(onSingleSubmit)}
+              disabled={createSlot.isPending}
+            >
+              {createSlot.isPending ? "Guardando..." : "Guardar"}
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="recurrente" className="mt-5 space-y-4">
@@ -265,17 +275,27 @@ function SheetForm({ voluntarioId, defaultDate, selectedWeekday, onClose, side =
             </div>
           )}
 
-          <Button
-            className="w-full"
-            onClick={recurringForm.handleSubmit(onRecurringSubmit)}
-            disabled={createBulk.isPending || previewSlots.length === 0 || selectedDias.length === 0}
-          >
-            {createBulk.isPending
-              ? "Guardando..."
-              : previewSlots.length === 0
-              ? "Selecciona días y horario"
-              : `Crear ${previewSlots.length} slot${previewSlots.length !== 1 ? "s" : ""}`}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={onClose}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="flex-1"
+              onClick={recurringForm.handleSubmit(onRecurringSubmit)}
+              disabled={createBulk.isPending || previewSlots.length === 0 || selectedDias.length === 0}
+            >
+              {createBulk.isPending
+                ? "Guardando..."
+                : previewSlots.length === 0
+                ? "Selecciona días y horario"
+                : `Crear ${previewSlots.length} slot${previewSlots.length !== 1 ? "s" : ""}`}
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

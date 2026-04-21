@@ -54,13 +54,13 @@ function SlotChip({ slot, onDelete }: SlotChipProps) {
         <span className="text-red-700 shrink-0">¿Eliminar?</span>
         <button
           className="ml-0.5 rounded p-0.5 text-red-700 hover:bg-red-100"
-          onClick={() => { onDelete(slot); setConfirming(false) }}
+          onClick={(e) => { e.stopPropagation(); onDelete(slot); setConfirming(false) }}
         >
           <Check className="size-2.5" />
         </button>
         <button
           className="rounded p-0.5 text-red-500 hover:bg-red-100"
-          onClick={() => setConfirming(false)}
+          onClick={(e) => { e.stopPropagation(); setConfirming(false) }}
         >
           <X className="size-2.5" />
         </button>

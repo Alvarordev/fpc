@@ -103,16 +103,18 @@ function resolveFaseSalud(categoria?: string) {
   return 'Otros'
 }
 
-function inferPayload(data: Partial<EnrollmentFormData>) {
+type InferredPayload = Partial<EnrollmentFormData> & Record<string, string | undefined>
+
+function inferPayload(data: Partial<EnrollmentFormData> & Record<string, unknown>): InferredPayload {
   const now = new Date()
   const fechaEnrolamiento = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`
   const mesEnrolamiento = monthsEs(now)
-  const edad = calculateAge(data.q11_fechaNacimiento)
+  const edad = calculateAge(data.q11_fechaNacimiento as string | undefined)
   const duracionLlamada = calculateDuration(
-    data.q2_horaInicio,
-    data.q133_horaFin,
+    data.q2_horaInicio as string | undefined,
+    data.q133_horaFin as string | undefined,
   )
-  const faseSalud = resolveFaseSalud(data.q27_categoria)
+  const faseSalud = resolveFaseSalud(data.q27_categoria as string | undefined)
 
   const merged = {
     ...data,
@@ -121,7 +123,7 @@ function inferPayload(data: Partial<EnrollmentFormData>) {
     edad,
     duracionLlamada,
     faseSalud,
-  }
+  } as InferredPayload
 
   return {
     ...merged,
@@ -141,7 +143,7 @@ async function submitEnrollment({
   data,
   agenteId,
 }: {
-  data: Partial<EnrollmentFormData>
+  data: Partial<EnrollmentFormData> & Partial<FormValues>
   agenteId: string
 }) {
   const inferredData = inferPayload(data)

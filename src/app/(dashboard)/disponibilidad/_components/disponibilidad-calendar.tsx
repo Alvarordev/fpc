@@ -18,7 +18,7 @@ interface DisponibilidadCalendarProps {
   year: number
   month: number
   slots: AvailabilitySlot[]
-  onDayClick: (date: Date) => void
+  onDayClick: (date: Date, anchor: HTMLElement) => void
   onSlotDelete: (slot: AvailabilitySlot) => void
 }
 

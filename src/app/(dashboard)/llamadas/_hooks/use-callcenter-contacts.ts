@@ -84,7 +84,7 @@ async function fetchCallcenterContacts(): Promise<ContactWithPatient[]> {
       motivos: Array.isArray(row.fpc_contact_motives)
         ? row.fpc_contact_motives.map((m) => String(m.motive_code))
         : [],
-      notas: row.notes,
+      notas: row.notes ?? "",
       camposActualizados: Array.isArray(row.updated_fields) ? row.updated_fields : [],
       motivoInconcluso: row.inconclusive_reason ?? undefined,
     })

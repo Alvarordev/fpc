@@ -10,23 +10,56 @@ import { CalendarLegend } from "./calendar-legend"
 import { VolunteersTable } from "./volunteers-table"
 import { getVolunteerColumns } from "../_utils/volunteer-columns"
 import type { Volunteer, AvailabilitySlot } from "@/types/volunteer"
-import { API_URL } from "@/lib/auth"
+import { supabase } from "@/lib/supabase"
 import { useAuthStore } from "@/store/auth-store"
 
 type VolunteerStatus = Volunteer["estado"]
 
+interface SlotRow {
+  id: string
+  legacy_id: string | null
+  volunteer?: { legacy_id?: number | string | null } | null
+  slot_date: string
+  start_time: string
+  end_time: string
+  status: AvailabilitySlot["estado"]
+}
+
 const NOW = new Date()
 
 async function fetchVolunteers(): Promise<Volunteer[]> {
-  const res = await fetch(`${API_URL}/volunteers`)
-  if (!res.ok) throw new Error("Error al cargar voluntarios")
-  return res.json()
+  const { data, error } = await supabase
+    .from("fpc_volunteers")
+    .select("id, legacy_id, nombre, apellido, email, telefono, estado, especialidad")
+
+  if (error) throw new Error("Error al cargar voluntarios")
+
+  return (data ?? []).map((row) => ({
+    id: Number(row.legacy_id ?? 0),
+    nombre: row.nombre,
+    apellido: row.apellido,
+    email: row.email,
+    telefono: row.telefono ?? "",
+    estado: row.estado,
+    especialidad: row.especialidad ?? "",
+  }))
 }
 
 async function fetchSlots(): Promise<AvailabilitySlot[]> {
-  const res = await fetch(`${API_URL}/availabilitySlots`)
-  if (!res.ok) throw new Error("Error al cargar disponibilidad")
-  return res.json()
+  const { data, error } = await supabase
+    .from("fpc_availability_slots")
+    .select("id, legacy_id, volunteer:fpc_volunteers!fpc_availability_slots_volunteer_id_fkey(legacy_id), slot_date, start_time, end_time, status")
+
+  if (error) throw new Error("Error al cargar disponibilidad")
+
+  return ((data ?? []) as SlotRow[]).map((row) => ({
+    id: String(row.legacy_id ?? row.id),
+    voluntarioId: Number(row.volunteer?.legacy_id ?? 0),
+    fecha: row.slot_date,
+    horaInicio: row.start_time?.slice(0, 5) ?? "",
+    horaFin: row.end_time?.slice(0, 5) ?? "",
+    estado: row.status,
+  }))
 }
 
 export function VolunteersContent() {

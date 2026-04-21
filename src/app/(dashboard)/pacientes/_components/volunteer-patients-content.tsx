@@ -7,10 +7,27 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { API_URL } from "@/lib/auth"
+import { supabase } from "@/lib/supabase"
 import { useVolunteerProfileId } from "@/hooks/use-volunteer-profile-id"
 import type { PsicoSession } from "@/types/follow-up"
 import type { Patient } from "@/types/patient"
+
+interface SessionRow {
+  id: string
+  legacy_id: string | null
+  patient?: { legacy_id?: string | null } | null
+  volunteer?: { legacy_id?: number | string | null } | null
+  availability_slot?: { legacy_id?: string | null } | null
+  session_number: number
+  session_date: string
+  start_time: string
+  end_time: string
+  mode: PsicoSession["modalidad"]
+  status: PsicoSession["estado"]
+  notes?: string | null
+  satisfaction?: number | null
+  extra_needed?: boolean | null
+}
 
 const TODAY = new Date().toISOString().slice(0, 10)
 
@@ -29,15 +46,48 @@ const estadoLabels: Record<PsicoSession["estado"], string> = {
 }
 
 async function fetchVolunteerSessions(voluntarioId: string): Promise<PsicoSession[]> {
-  const res = await fetch(`${API_URL}/psicoSessions?voluntarioId=${voluntarioId}`)
-  if (!res.ok) throw new Error("Error al cargar sesiones")
-  return res.json()
+  const { data: volunteer, error: volunteerError } = await supabase
+    .from("fpc_volunteers")
+    .select("id")
+    .eq("id", voluntarioId)
+    .maybeSingle()
+  if (volunteerError || !volunteer) throw new Error("Error al cargar sesiones")
+
+  const { data, error } = await supabase
+    .from("fpc_psico_sessions")
+    .select("id, legacy_id, patient:fpc_patients!fpc_psico_sessions_patient_id_fkey(legacy_id), volunteer:fpc_volunteers!fpc_psico_sessions_volunteer_id_fkey(legacy_id), availability_slot:fpc_availability_slots!fpc_psico_sessions_availability_slot_id_fkey(legacy_id), session_number, session_date, start_time, end_time, mode, status, notes, satisfaction, extra_needed")
+    .eq("volunteer_id", volunteer.id)
+
+  if (error) throw new Error("Error al cargar sesiones")
+
+  return ((data ?? []) as SessionRow[]).map((row) => ({
+    id: String(row.legacy_id ?? row.id),
+    pacienteId: String(row.patient?.legacy_id ?? ""),
+    voluntarioId: Number(row.volunteer?.legacy_id ?? 0),
+    availabilitySlotId: row.availability_slot?.legacy_id ? String(row.availability_slot.legacy_id) : undefined,
+    sesionNumero: Number(row.session_number ?? 1),
+    fecha: row.session_date,
+    horaInicio: row.start_time?.slice(0, 5) ?? "",
+    horaFin: row.end_time?.slice(0, 5) ?? "",
+    modalidad: row.mode,
+    estado: row.status,
+    notas: row.notes ?? "",
+    satisfaccion: row.satisfaction ?? undefined,
+    extraNeeded: row.extra_needed ?? undefined,
+  }))
 }
 
 async function fetchAllPatients(): Promise<Patient[]> {
-  const res = await fetch(`${API_URL}/patients`)
-  if (!res.ok) throw new Error("Error al cargar pacientes")
-  return res.json()
+  const { data, error } = await supabase
+    .from("fpc_patients")
+    .select("id, legacy_id, enrollment_payload")
+
+  if (error) throw new Error("Error al cargar pacientes")
+
+  return (data ?? []).map((row) => ({
+    ...(row.enrollment_payload as Patient),
+    id: String(row.legacy_id ?? row.id),
+  }))
 }
 
 export function VolunteerPatientsContent() {

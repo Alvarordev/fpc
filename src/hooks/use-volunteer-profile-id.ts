@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { API_URL } from "@/lib/auth"
+import { supabase } from "@/lib/supabase"
 import { useAuthStore } from "@/store/auth-store"
 import type { User } from "@/types/auth"
 
@@ -12,19 +12,24 @@ import type { User } from "@/types/auth"
  */
 export function useVolunteerProfileId(): string | undefined {
   const user = useAuthStore((s) => s.user)
-  const login = useAuthStore((s) => s.login)
 
-  const needsRefresh = user?.role === "voluntario" && !user.volunteerProfileId
+  const needsRefresh = user?.role === "voluntario" && !user.volunteerProfileId && Boolean(user?.id)
 
   const { data: freshUser } = useQuery({
     queryKey: ["currentUser", user?.id],
     queryFn: async () => {
-      const res = await fetch(`${API_URL}/users/${user!.id}`)
-      if (!res.ok) throw new Error("Error al refrescar usuario")
-      const data = await res.json()
-      const { password: _, ...u } = data
-      login(u as User)
-      return u as User
+      const { data, error } = await supabase
+        .from("fpc_volunteers")
+        .select("id")
+        .eq("user_id", user!.id)
+        .maybeSingle()
+
+      if (error) throw new Error("Error al refrescar perfil de voluntario")
+
+      return {
+        ...user,
+        volunteerProfileId: data?.id,
+      } as User
     },
     enabled: needsRefresh,
     staleTime: Infinity,

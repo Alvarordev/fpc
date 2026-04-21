@@ -9,7 +9,7 @@ export interface Volunteer {
 }
 
 export interface AvailabilitySlot {
-  id: number
+  id: string
   voluntarioId: number
   fecha: string
   horaInicio: string

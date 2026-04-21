@@ -91,7 +91,7 @@ interface DisponibilidadDayCellProps {
   currentMonth: number
   slots: AvailabilitySlot[]
   isPast: boolean
-  onDayClick: (date: Date) => void
+  onDayClick: (date: Date, anchor: HTMLElement) => void
   onSlotDelete: (slot: AvailabilitySlot) => void
 }
 
@@ -116,7 +116,10 @@ export function DisponibilidadDayCell({
         isPast && isCurrentMonth && "bg-muted/10",
         clickable && slots.length === 0 && "cursor-pointer hover:bg-muted/20 group"
       )}
-      onClick={() => clickable && slots.length === 0 && onDayClick(date)}
+      onClick={(e) => {
+        if (!clickable) return
+        onDayClick(date, e.currentTarget)
+      }}
     >
       <span
         className={cn(
@@ -128,7 +131,7 @@ export function DisponibilidadDayCell({
         {date.getDate()}
       </span>
 
-      {clickable && slots.length === 0 && (
+      {clickable && (
         <span className="text-muted-foreground/30 group-hover:text-muted-foreground/60 text-lg leading-none mx-auto mt-1 transition-colors select-none">
           +
         </span>

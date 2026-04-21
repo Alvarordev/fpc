@@ -20,7 +20,7 @@ import { SectionHeader } from '../section-header'
 import { StepNav } from '../step-nav'
 import { useMutation } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { API_URL } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/auth-store'
 
 const schema = z.object({
@@ -145,44 +145,76 @@ async function submitEnrollment({
   agenteId: string
 }) {
   const inferredData = inferPayload(data)
-  const patientRes = await fetch(`${API_URL}/patients`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      ...inferredData,
-      fechaCreacion: new Date().toISOString(),
-      estado: 'activo',
-    }),
-  })
-  if (!patientRes.ok) throw new Error('Error al guardar')
+  const legacyPatientId = `p-${Date.now()}`
+  const nowIso = new Date().toISOString()
 
-  const patient = await patientRes.json()
+  const { data: patient, error: patientError } = await supabase
+    .from('fpc_patients')
+    .insert({
+      legacy_id: legacyPatientId,
+      status: 'activo',
+      patient_number: inferredData.nroPaciente ?? null,
+      full_name: inferredData.q9_nombrePaciente ?? 'Sin nombre',
+      dni: inferredData.q10_dni ?? null,
+      birth_date: inferredData.q11_fechaNacimiento ?? null,
+      phone: inferredData.q17_telefono ?? null,
+      aux_phone: inferredData.q18_telefonoAuxiliar ?? null,
+      family_phone: inferredData.q19_telefonoFamiliar ?? null,
+      caregiver_name: inferredData.q20_nombreFamiliar ?? null,
+      caregiver_gender: inferredData.generoCuidador ?? null,
+      entry_point: inferredData.puntoIngreso ?? null,
+      health_phase: inferredData.faseSalud ?? null,
+      enrolled_at: nowIso.slice(0, 10),
+      enrollment_payload: {
+        ...inferredData,
+        id: legacyPatientId,
+        fechaCreacion: nowIso,
+        estado: 'activo',
+      },
+      created_by_user_id: agenteId || null,
+    })
+    .select('id, legacy_id')
+    .single()
 
-  const start = inferredData.q2_horaInicio ?? ''
-  const end = inferredData.q133_horaFin ?? ''
+  if (patientError || !patient) throw new Error('Error al guardar')
 
-  const contactRes = await fetch(`${API_URL}/contacts`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      id: `ct-enroll-${Date.now()}`,
-      pacienteId: String(patient.id),
-      agenteId,
-      origen: 'enrolamiento',
-      tipo: 'entrante',
-      estado: 'completado',
-      fecha: (patient.fechaCreacion ?? new Date().toISOString()).slice(0, 10),
-      horaInicio: start,
-      horaFin: end,
-      motivos: ['otro'],
-      notas: 'Contacto inicial de enrolamiento en programa SEPA',
-      camposActualizados: [],
-    }),
-  })
+  const contactLegacyId = `ct-enroll-${Date.now()}`
+  const { data: contact, error: contactError } = await supabase
+    .from('fpc_contacts')
+    .insert({
+      legacy_id: contactLegacyId,
+      patient_id: patient.id,
+      created_by_user_id: agenteId || null,
+      assigned_user_id: agenteId || null,
+      origin: 'enrolamiento',
+      direction: 'entrante',
+      status: 'completado',
+      contact_date: nowIso.slice(0, 10),
+      start_time: inferredData.q2_horaInicio ? `${inferredData.q2_horaInicio}:00` : null,
+      end_time: inferredData.q133_horaFin ? `${inferredData.q133_horaFin}:00` : null,
+      notes: 'Contacto inicial de enrolamiento en programa SEPA',
+      updated_fields: [],
+    })
+    .select('id')
+    .single()
 
-  if (!contactRes.ok) throw new Error('Paciente creado sin contacto inicial')
+  if (contactError || !contact) throw new Error('Paciente creado sin contacto inicial')
 
-  return patient
+  const { error: motiveError } = await supabase
+    .from('fpc_contact_motives')
+    .insert({
+      contact_id: contact.id,
+      motive_code: 'otro',
+    })
+
+  if (motiveError) throw new Error('Paciente creado sin motivo inicial')
+
+  return {
+    id: String(patient.legacy_id ?? patient.id),
+    ...inferredData,
+    fechaCreacion: nowIso,
+    estado: 'activo',
+  }
 }
 
 export function Step8Cierre() {
@@ -336,13 +368,11 @@ export function Step8Cierre() {
       </section>
 
       {mutation.isError && (
-        <div className="border-destructive/20 bg-destructive/5 rounded-xl border p-4">
-          <p className="text-destructive text-sm">
-            Error al guardar. Verifique que el servidor esté activo (
-            <code className="bg-destructive/10 rounded px-1">pnpm server</code>)
-            e intente nuevamente.
-          </p>
-        </div>
+      <div className="border-destructive/20 bg-destructive/5 rounded-xl border p-4">
+        <p className="text-destructive text-sm">
+            Error al guardar. Verificá la conexión con Supabase e intentá nuevamente.
+        </p>
+      </div>
       )}
 
       <StepNav

@@ -4,12 +4,6 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,6 +19,7 @@ import { cn } from "@/lib/utils"
 import { SlotPreviewList } from "./slot-preview-list"
 import { useCreateSlot, useCreateBulkSlots } from "../_hooks/use-availability"
 import type { BulkSlotPayload } from "../_hooks/use-availability"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const TODAY = new Date().toISOString().slice(0, 10)
 
@@ -91,12 +86,16 @@ function computeRecurringDates(
 interface SheetFormProps {
   voluntarioId: string
   defaultDate?: string
+  selectedWeekday?: number
   onClose: () => void
+  side?: "left" | "right"
 }
 
-function SheetForm({ voluntarioId, defaultDate, onClose }: SheetFormProps) {
+function SheetForm({ voluntarioId, defaultDate, selectedWeekday, onClose, side = "right" }: SheetFormProps) {
   const [tab, setTab] = useState("individual")
-  const [selectedDias, setSelectedDias] = useState<number[]>([])
+  const [selectedDias, setSelectedDias] = useState<number[]>(
+    typeof selectedWeekday === "number" ? [selectedWeekday] : []
+  )
   const createSlot = useCreateSlot(voluntarioId)
   const createBulk = useCreateBulkSlots(voluntarioId)
 
@@ -129,7 +128,6 @@ function SheetForm({ voluntarioId, defaultDate, onClose }: SheetFormProps) {
 
   async function onSingleSubmit(values: SingleForm) {
     await createSlot.mutateAsync({
-      voluntarioId: Number(voluntarioId),
       fecha: values.fecha,
       horaInicio: values.horaInicio,
       horaFin: values.horaFin,
@@ -145,7 +143,7 @@ function SheetForm({ voluntarioId, defaultDate, onClose }: SheetFormProps) {
   }
 
   return (
-    <div className="px-6 pb-6">
+    <div className={cn("px-5 pb-5", side === "left" ? "pr-6" : "pl-6")}>
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="w-full">
           <TabsTrigger value="individual" className="flex-1">Fecha individual</TabsTrigger>
@@ -289,6 +287,8 @@ interface AddAvailabilitySheetProps {
   onOpenChange: (open: boolean) => void
   voluntarioId: string
   defaultDate?: string
+  selectedWeekday?: number
+  anchorPosition?: { x: number; y: number; side: "left" | "right" }
 }
 
 export function AddAvailabilitySheet({
@@ -296,24 +296,41 @@ export function AddAvailabilitySheet({
   onOpenChange,
   voluntarioId,
   defaultDate,
+  selectedWeekday,
+  anchorPosition,
 }: AddAvailabilitySheetProps) {
   function handleClose() {
     onOpenChange(false)
   }
 
   return (
-    <Sheet open={open} onOpenChange={handleClose}>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto p-0">
-        <SheetHeader className="px-6 pt-6 pb-5">
-          <SheetTitle>Agregar disponibilidad</SheetTitle>
-        </SheetHeader>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent
+        noOverlay
+        showCloseButton={false}
+        className="w-[360px] max-w-[calc(100vw-2rem)] p-0"
+        style={
+          anchorPosition
+            ? {
+                top: `${anchorPosition.y}px`,
+                left: `${anchorPosition.x}px`,
+                transform: "none",
+              }
+            : undefined
+        }
+      >
+        <DialogHeader className="px-5 pt-5 pb-4">
+          <DialogTitle>Agregar disponibilidad</DialogTitle>
+        </DialogHeader>
         <SheetForm
-          key={`${open ? "open" : "closed"}-${defaultDate ?? "none"}`}
+          key={`${open ? "open" : "closed"}-${defaultDate ?? "none"}-${selectedWeekday ?? "none"}`}
           voluntarioId={voluntarioId}
           defaultDate={defaultDate}
+          selectedWeekday={selectedWeekday}
           onClose={handleClose}
+          side={anchorPosition?.side}
         />
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }

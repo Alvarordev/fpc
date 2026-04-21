@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist, type StorageValue } from 'zustand/middleware'
 import { AUTH_COOKIE_NAME } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
 import type { User } from '@/types/auth'
 
 interface AuthState {
@@ -38,6 +39,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       login: (user) => set({ user }),
       logout: () => {
+        void supabase.auth.signOut()
         set({ user: null })
         cookieStorage.removeItem(AUTH_COOKIE_NAME)
       },

@@ -32,10 +32,15 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
   )
 }
 
-function DialogContent({ className, children, ...props }: DialogPrimitive.Popup.Props) {
+interface DialogContentProps extends DialogPrimitive.Popup.Props {
+  noOverlay?: boolean
+  showCloseButton?: boolean
+}
+
+function DialogContent({ className, children, noOverlay = false, showCloseButton = true, ...props }: DialogContentProps) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      {!noOverlay && <DialogOverlay />}
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
@@ -45,13 +50,15 @@ function DialogContent({ className, children, ...props }: DialogPrimitive.Popup.
         {...props}
       >
         {children}
-        <DialogPrimitive.Close
-          data-slot="dialog-close"
-          render={<Button variant="ghost" size="icon-sm" className="absolute top-4 right-4" />}
-        >
-          <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
-          <span className="sr-only">Cerrar</span>
-        </DialogPrimitive.Close>
+        {showCloseButton && (
+          <DialogPrimitive.Close
+            data-slot="dialog-close"
+            render={<Button variant="ghost" size="icon-sm" className="absolute top-4 right-4" />}
+          >
+            <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
+            <span className="sr-only">Cerrar</span>
+          </DialogPrimitive.Close>
+        )}
       </DialogPrimitive.Popup>
     </DialogPortal>
   )

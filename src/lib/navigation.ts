@@ -6,6 +6,7 @@ import {
   UserCheck,
   TriangleAlert,
   Building2,
+  ShieldUser,
 } from "lucide-react"
 import type { NavGroup } from "@/types/navigation"
 import type { UserRole } from "@/types/auth"
@@ -62,6 +63,7 @@ export const navConfig: Record<UserRole, NavGroup[]> = {
         { title: "Dashboard", url: "/", icon: LayoutDashboard },
         { title: "Pacientes", url: "/pacientes", icon: Users },
         { title: "Voluntarios", url: "/voluntarios", icon: UserCheck },
+        { title: "Usuarios", url: "/usuarios", icon: ShieldUser },
       ],
     },
     {
@@ -83,4 +85,5 @@ export const pathTitles: Record<string, string> = {
   "/voluntarios": "Voluntarios",
   "/alertas": "Alertas",
   "/hospitales": "Hospitales",
+  "/usuarios": "Usuarios",
 }

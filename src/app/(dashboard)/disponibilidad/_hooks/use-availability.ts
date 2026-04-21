@@ -47,12 +47,17 @@ interface CreateSlotPayload {
   estado: AvailabilitySlot["estado"]
 }
 
+export interface BulkSlotPayload {
+  fecha: string
+  horaInicio: string
+  horaFin: string
+}
+
 async function postSlot(
   volunteerId: string,
   payload: CreateSlotPayload
 ): Promise<AvailabilitySlot> {
-
-  const legacyId = `slot-${Date.now()}`
+  const legacyId = `slot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 
   const { data, error } = await supabase
     .from("fpc_availability_slots")
@@ -74,6 +79,36 @@ async function postSlot(
     ...payload,
     id: String(data.legacy_id ?? data.id),
   }
+}
+
+async function postBulkSlots(
+  volunteerId: string,
+  slots: BulkSlotPayload[]
+): Promise<AvailabilitySlot[]> {
+  if (slots.length === 0) return []
+
+  const rows = slots.map((s) => ({
+    legacy_id: `slot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    volunteer_id: volunteerId,
+    slot_date: s.fecha,
+    start_time: `${s.horaInicio}:00`,
+    end_time: `${s.horaFin}:00`,
+    status: "disponible" as const,
+  }))
+
+  const { data, error } = await supabase
+    .from("fpc_availability_slots")
+    .insert(rows)
+    .select("id, legacy_id")
+
+  if (error || !data) throw new Error("Error al crear disponibilidades")
+
+  return slots.map((s, i) => ({
+    voluntarioId: 0,
+    ...s,
+    estado: "disponible" as const,
+    id: String(data[i]?.legacy_id ?? data[i]?.id ?? `${Date.now()}-${i}`),
+  }))
 }
 
 async function deleteSlot(id: string): Promise<void> {
@@ -117,26 +152,10 @@ export function useDeleteSlot(voluntarioId: string) {
   })
 }
 
-export interface BulkSlotPayload {
-  fecha: string
-  horaInicio: string
-  horaFin: string
-}
-
 export function useCreateBulkSlots(voluntarioId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (slots: BulkSlotPayload[]) =>
-      Promise.all(
-        slots.map((s) =>
-          postSlot(voluntarioId, {
-            fecha: s.fecha,
-            horaInicio: s.horaInicio,
-            horaFin: s.horaFin,
-            estado: "disponible",
-          })
-        )
-      ),
+    mutationFn: (slots: BulkSlotPayload[]) => postBulkSlots(voluntarioId, slots),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myAvailabilitySlots", voluntarioId] })
       queryClient.invalidateQueries({ queryKey: ["availabilitySlots"] })

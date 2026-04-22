@@ -12,6 +12,9 @@ const VOLUNTEER_COLORS = [
 ]
 
 export function getVolunteerColor(voluntarioId: number) {
+  if (!Number.isFinite(voluntarioId) || voluntarioId <= 0) {
+    return VOLUNTEER_COLORS[0]
+  }
   return VOLUNTEER_COLORS[(voluntarioId - 1) % VOLUNTEER_COLORS.length]
 }
 

@@ -25,7 +25,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { email, password, role, nombre, apellido, telefono } = body
+  const { email, password, role, nombre, apellido, telefono, especialidad } = body
 
   if (!email || !password || !role || !nombre || !apellido) {
     return NextResponse.json(
@@ -84,6 +84,7 @@ export async function POST(request: NextRequest) {
       email,
       telefono: telefono ?? null,
       estado: "activo",
+      especialidad: especialidad ?? "Psicología oncológica",
     })
 
     if (volunteerError) {

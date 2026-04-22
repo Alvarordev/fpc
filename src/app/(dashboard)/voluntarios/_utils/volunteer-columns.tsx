@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import type { Volunteer, AvailabilitySlot } from "@/types/volunteer"
-import { getVolunteerColor } from "./calendar-helpers"
+import { getVolunteerColor } from "@/lib/calendar-helpers"
 import { volunteerStatusLabels } from "./volunteer-data"
 
 const statusStyles: Record<Volunteer["estado"], string> = {

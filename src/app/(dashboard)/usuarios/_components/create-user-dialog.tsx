@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -14,6 +14,13 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useCreateUser } from '@/hooks/use-users'
 
 const baseSchema = z.object({
@@ -27,6 +34,7 @@ const callcenterSchema = baseSchema
 
 const voluntarioSchema = baseSchema.extend({
   telefono: z.string().optional(),
+  especialidad: z.string().min(1, 'Requerido'),
 })
 
 type CallcenterForm = z.infer<typeof callcenterSchema>
@@ -48,7 +56,7 @@ export function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) 
 
   const volForm = useForm<VoluntarioForm>({
     resolver: zodResolver(voluntarioSchema),
-    defaultValues: { nombre: '', apellido: '', email: '', password: '', telefono: '' },
+    defaultValues: { nombre: '', apellido: '', email: '', password: '', telefono: '', especialidad: 'Psicología oncológica' },
   })
 
   function handleClose() {
@@ -70,6 +78,7 @@ export function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) 
       ...values,
       role: 'voluntario',
       telefono: values.telefono || undefined,
+      especialidad: values.especialidad,
     })
     handleClose()
   }
@@ -180,6 +189,26 @@ export function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) 
               <div className="space-y-2">
                 <Label className="text-xs">Teléfono (opcional)</Label>
                 <Input {...volForm.register('telefono')} className="h-9 text-sm" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">Especialidad</Label>
+                <Controller
+                  name="especialidad"
+                  control={volForm.control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="h-9 text-sm w-full">
+                        <SelectValue placeholder="Seleccionar especialidad" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Psicología oncológica">Psicología oncológica</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {volForm.formState.errors.especialidad && (
+                  <p className="text-xs text-destructive">{volForm.formState.errors.especialidad.message}</p>
+                )}
               </div>
               <div className="flex gap-2 pt-2">
                 <Button

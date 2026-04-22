@@ -25,4 +25,5 @@ export interface CreateUserPayload {
   nombre: string
   apellido: string
   telefono?: string
+  especialidad?: string
 }

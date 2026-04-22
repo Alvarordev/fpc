@@ -17,6 +17,7 @@ import { useAuthStore } from '@/store/auth-store'
 const statusStyles: Record<PatientStatus, string> = {
   activo: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   inactivo: 'bg-zinc-100 text-zinc-600 border-zinc-200',
+  prospecto: 'bg-violet-50 text-violet-700 border-violet-200',
 }
 
 interface PatientDetailContentProps {

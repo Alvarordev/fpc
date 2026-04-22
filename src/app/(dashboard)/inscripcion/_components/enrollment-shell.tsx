@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef, useCallback } from "react"
 import { useEnrollmentStore } from "../_store/enrollment-store"
 import { EnrollmentStepper } from "./enrollment-stepper"
 import { EnrollmentAside } from "./enrollment-aside"
@@ -15,6 +16,7 @@ import { Step8Cierre } from "./steps/step-8-cierre"
 import { resolveAsideContent } from "../_utils/aside-resolver"
 import type { EnrollmentFormData } from "../_types/enrollment-types"
 import { Q27_BRANCH_MAP } from "../_types/enrollment-types"
+import { usePatient, useDeleteProspect } from "@/app/(dashboard)/pacientes/[id]/_hooks/use-patient"
 
 function CurrentStep({ step }: { step: number }) {
   switch (step) {
@@ -30,9 +32,31 @@ function CurrentStep({ step }: { step: number }) {
   }
 }
 
-export function EnrollmentShell() {
-  const { currentStep, rejectionReason, formData, resetEnrollment, prevStep, clearRejection } =
-    useEnrollmentStore()
+interface EnrollmentShellProps {
+  prospectoId?: string
+}
+
+export function EnrollmentShell({ prospectoId }: EnrollmentShellProps) {
+  const {
+    currentStep,
+    rejectionReason,
+    formData,
+    resetEnrollment,
+    prevStep,
+    clearRejection,
+    setProspectoId,
+    saveStepData,
+    prospectoId: storeProspectoId,
+  } = useEnrollmentStore()
+
+  const { data: prospectPatient } = usePatient(prospectoId ?? "")
+  const deleteProspect = useDeleteProspect()
+  const prospectoIdRef = useRef(storeProspectoId)
+
+  // Mantener ref actualizada para usar en handlers
+  useEffect(() => {
+    prospectoIdRef.current = storeProspectoId
+  }, [storeProspectoId])
 
   const partial = formData as Partial<EnrollmentFormData>
   const categoria = partial.q27_categoria ?? ""
@@ -40,10 +64,35 @@ export function EnrollmentShell() {
 
   const asideContent = resolveAsideContent(currentStep, branch)
 
+  // Precargar datos del prospecto al iniciar
+  useEffect(() => {
+    if (prospectoId && prospectPatient) {
+      setProspectoId(prospectoId)
+      saveStepData({
+        q9_nombrePaciente: prospectPatient.q9_nombrePaciente,
+        q17_telefono: prospectPatient.q17_telefono,
+        q10_dni: prospectPatient.q10_dni,
+        puntoIngreso: prospectPatient.puntoIngreso,
+      })
+    }
+  }, [prospectoId, prospectPatient, setProspectoId, saveStepData])
+
   const handleRejectionBack = () => {
     clearRejection()
     prevStep()
   }
+
+  const handleReset = useCallback(async () => {
+    const currentProspectoId = prospectoIdRef.current
+
+    // Si venimos de un prospecto y el rechazo fue por consentimiento (q8_no),
+    // borramos el prospecto y sus contactos
+    if (currentProspectoId) {
+      await deleteProspect.mutateAsync(currentProspectoId)
+    }
+
+    resetEnrollment()
+  }, [deleteProspect, resetEnrollment])
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -57,7 +106,7 @@ export function EnrollmentShell() {
             {rejectionReason ? (
               <EnrollmentRejection
                 reason={rejectionReason}
-                onReset={resetEnrollment}
+                onReset={handleReset}
                 onBack={handleRejectionBack}
               />
             ) : (
@@ -68,7 +117,11 @@ export function EnrollmentShell() {
 
         <div className="hidden w-80 shrink-0 overflow-y-auto border-l border-border/50 bg-muted/30 lg:block xl:w-96">
           <div className="px-6 py-8">
-            <EnrollmentAside content={asideContent} currentStep={currentStep} />
+            <EnrollmentAside
+              content={asideContent}
+              currentStep={currentStep}
+              onReset={handleReset}
+            />
           </div>
         </div>
       </div>

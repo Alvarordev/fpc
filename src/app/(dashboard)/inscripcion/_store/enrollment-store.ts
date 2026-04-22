@@ -8,6 +8,7 @@ interface EnrollmentState {
   rejectionReason: RejectionReason | null
   formData: Partial<EnrollmentFormData>
   isComplete: boolean
+  prospectoId: string | null
 
   goToStep: (step: number) => void
   nextStep: () => void
@@ -17,6 +18,7 @@ interface EnrollmentState {
   clearRejection: () => void
   completeEnrollment: () => void
   resetEnrollment: () => void
+  setProspectoId: (id: string | null) => void
 }
 
 const initialState = {
@@ -24,6 +26,7 @@ const initialState = {
   rejectionReason: null as RejectionReason | null,
   formData: {} as Partial<EnrollmentFormData>,
   isComplete: false,
+  prospectoId: null as string | null,
 }
 
 export const useEnrollmentStore = create<EnrollmentState>()(
@@ -56,6 +59,8 @@ export const useEnrollmentStore = create<EnrollmentState>()(
       completeEnrollment: () => set({ isComplete: true }),
 
       resetEnrollment: () => set(initialState),
+
+      setProspectoId: (id) => set({ prospectoId: id }),
     }),
     {
       name: "fpc-enrollment-draft",

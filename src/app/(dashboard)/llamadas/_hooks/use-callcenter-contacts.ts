@@ -8,12 +8,14 @@ import type { Patient } from "@/types/patient"
 interface ContactWithPatient extends Contact {
   patientName: string
   patientDni: string
+  patientPhone: string
+  patientStatus: string
 }
 
 interface ContactRow {
   id: string
   legacy_id: string | null
-  patient?: { legacy_id?: string | null; enrollment_payload?: Patient | null } | null
+  patient?: { legacy_id?: string | null; enrollment_payload?: Patient | null; status?: string | null } | null
   created_by?: { id?: string | null } | null
   origin: Contact["origen"]
   direction: Contact["tipo"]
@@ -53,7 +55,7 @@ async function fetchCallcenterContacts(): Promise<ContactWithPatient[]> {
     .select(`
       id,
       legacy_id,
-      patient:fpc_patients!fpc_contacts_patient_id_fkey(legacy_id, enrollment_payload),
+      patient:fpc_patients!fpc_contacts_patient_id_fkey(legacy_id, enrollment_payload, status),
       created_by:fpc_users!fpc_contacts_created_by_user_id_fkey(id),
       origin,
       direction,
@@ -93,6 +95,8 @@ async function fetchCallcenterContacts(): Promise<ContactWithPatient[]> {
       ...contact,
       patientName: payload?.q9_nombrePaciente ?? "Paciente desconocido",
       patientDni: payload?.q10_dni ?? "—",
+      patientPhone: payload?.q17_telefono ?? "",
+      patientStatus: row.patient?.status ?? "activo",
     }
   })
 }

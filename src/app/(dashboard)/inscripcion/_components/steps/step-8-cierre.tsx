@@ -142,77 +142,160 @@ function inferPayload(data: Partial<EnrollmentFormData> & Record<string, unknown
 async function submitEnrollment({
   data,
   agenteId,
+  prospectoId,
 }: {
   data: Partial<EnrollmentFormData> & Partial<FormValues>
   agenteId: string
+  prospectoId?: string | null
 }) {
   const inferredData = inferPayload(data)
-  const legacyPatientId = `p-${Date.now()}`
   const nowIso = new Date().toISOString()
 
-  const { data: patient, error: patientError } = await supabase
-    .from('fpc_patients')
-    .insert({
-      legacy_id: legacyPatientId,
-      status: 'activo',
-      patient_number: inferredData.nroPaciente ?? null,
-      full_name: inferredData.q9_nombrePaciente ?? 'Sin nombre',
-      dni: inferredData.q10_dni ?? null,
-      birth_date: inferredData.q11_fechaNacimiento ?? null,
-      phone: inferredData.q17_telefono ?? null,
-      aux_phone: inferredData.q18_telefonoAuxiliar ?? null,
-      family_phone: inferredData.q19_telefonoFamiliar ?? null,
-      caregiver_name: inferredData.q20_nombreFamiliar ?? null,
-      caregiver_gender: inferredData.generoCuidador ?? null,
-      entry_point: inferredData.puntoIngreso ?? null,
-      health_phase: inferredData.faseSalud ?? null,
-      enrolled_at: nowIso.slice(0, 10),
-      enrollment_payload: {
-        ...inferredData,
-        id: legacyPatientId,
-        fechaCreacion: nowIso,
-        estado: 'activo',
-      },
-      created_by_user_id: agenteId || null,
-    })
-    .select('id, legacy_id')
-    .single()
+  let patientId: string
+  let patientUuid: string
 
-  if (patientError || !patient) throw new Error('Error al guardar')
+  if (prospectoId) {
+    // ── Actualizar prospecto existente ──
+    const { data: existingPatient, error: findError } = await supabase
+      .from('fpc_patients')
+      .select('id, legacy_id')
+      .eq('legacy_id', prospectoId)
+      .single()
 
-  const contactLegacyId = `ct-enroll-${Date.now()}`
-  const { data: contact, error: contactError } = await supabase
-    .from('fpc_contacts')
-    .insert({
-      legacy_id: contactLegacyId,
-      patient_id: patient.id,
-      created_by_user_id: agenteId || null,
-      assigned_user_id: agenteId || null,
-      origin: 'enrolamiento',
-      direction: 'entrante',
-      status: 'completado',
-      contact_date: nowIso.slice(0, 10),
-      start_time: inferredData.q2_horaInicio ? `${inferredData.q2_horaInicio}:00` : null,
-      end_time: inferredData.q133_horaFin ? `${inferredData.q133_horaFin}:00` : null,
-      notes: 'Contacto inicial de enrolamiento en programa SEPA',
-      updated_fields: [],
-    })
-    .select('id')
-    .single()
+    if (findError || !existingPatient) throw new Error('Prospecto no encontrado')
 
-  if (contactError || !contact) throw new Error('Paciente creado sin contacto inicial')
+    patientUuid = existingPatient.id
+    patientId = String(existingPatient.legacy_id ?? existingPatient.id)
 
-  const { error: motiveError } = await supabase
-    .from('fpc_contact_motives')
-    .insert({
-      contact_id: contact.id,
-      motive_code: 'otro',
-    })
+    const { error: updateError } = await supabase
+      .from('fpc_patients')
+      .update({
+        status: 'activo',
+        patient_number: inferredData.nroPaciente ?? null,
+        full_name: inferredData.q9_nombrePaciente ?? 'Sin nombre',
+        dni: inferredData.q10_dni ?? null,
+        birth_date: inferredData.q11_fechaNacimiento ?? null,
+        phone: inferredData.q17_telefono ?? null,
+        aux_phone: inferredData.q18_telefonoAuxiliar ?? null,
+        family_phone: inferredData.q19_telefonoFamiliar ?? null,
+        caregiver_name: inferredData.q20_nombreFamiliar ?? null,
+        caregiver_gender: inferredData.generoCuidador ?? null,
+        entry_point: inferredData.puntoIngreso ?? null,
+        health_phase: inferredData.faseSalud ?? null,
+        enrolled_at: nowIso.slice(0, 10),
+        enrollment_payload: {
+          ...inferredData,
+          id: patientId,
+          fechaCreacion: nowIso,
+          estado: 'activo',
+        },
+      })
+      .eq('id', patientUuid)
 
-  if (motiveError) throw new Error('Paciente creado sin motivo inicial')
+    if (updateError) throw new Error('Error al actualizar prospecto')
+
+    // ── Actualizar contacto agendado a enrolamiento ──
+    const { data: scheduledContact } = await supabase
+      .from('fpc_contacts')
+      .select('id')
+      .eq('patient_id', patientUuid)
+      .eq('status', 'agendado')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (scheduledContact) {
+      await supabase
+        .from('fpc_contacts')
+        .update({
+          origin: 'enrolamiento',
+          direction: 'entrante',
+          status: 'completado',
+          contact_date: nowIso.slice(0, 10),
+          start_time: inferredData.q2_horaInicio ? `${inferredData.q2_horaInicio}:00` : null,
+          end_time: inferredData.q133_horaFin ? `${inferredData.q133_horaFin}:00` : null,
+          notes: 'Contacto inicial de enrolamiento en programa SEPA',
+        })
+        .eq('id', scheduledContact.id)
+
+      await supabase
+        .from('fpc_contact_motives')
+        .upsert({
+          contact_id: scheduledContact.id,
+          motive_code: 'otro',
+        }, { onConflict: 'contact_id,motive_code' })
+    }
+  } else {
+    // ── Crear paciente nuevo (flujo original) ──
+    const legacyPatientId = `p-${Date.now()}`
+
+    const { data: patient, error: patientError } = await supabase
+      .from('fpc_patients')
+      .insert({
+        legacy_id: legacyPatientId,
+        status: 'activo',
+        patient_number: inferredData.nroPaciente ?? null,
+        full_name: inferredData.q9_nombrePaciente ?? 'Sin nombre',
+        dni: inferredData.q10_dni ?? null,
+        birth_date: inferredData.q11_fechaNacimiento ?? null,
+        phone: inferredData.q17_telefono ?? null,
+        aux_phone: inferredData.q18_telefonoAuxiliar ?? null,
+        family_phone: inferredData.q19_telefonoFamiliar ?? null,
+        caregiver_name: inferredData.q20_nombreFamiliar ?? null,
+        caregiver_gender: inferredData.generoCuidador ?? null,
+        entry_point: inferredData.puntoIngreso ?? null,
+        health_phase: inferredData.faseSalud ?? null,
+        enrolled_at: nowIso.slice(0, 10),
+        enrollment_payload: {
+          ...inferredData,
+          id: legacyPatientId,
+          fechaCreacion: nowIso,
+          estado: 'activo',
+        },
+        created_by_user_id: agenteId || null,
+      })
+      .select('id, legacy_id')
+      .single()
+
+    if (patientError || !patient) throw new Error('Error al guardar')
+
+    patientUuid = patient.id
+    patientId = String(patient.legacy_id ?? patient.id)
+
+    const contactLegacyId = `ct-enroll-${Date.now()}`
+    const { data: contact, error: contactError } = await supabase
+      .from('fpc_contacts')
+      .insert({
+        legacy_id: contactLegacyId,
+        patient_id: patientUuid,
+        created_by_user_id: agenteId || null,
+        assigned_user_id: agenteId || null,
+        origin: 'enrolamiento',
+        direction: 'entrante',
+        status: 'completado',
+        contact_date: nowIso.slice(0, 10),
+        start_time: inferredData.q2_horaInicio ? `${inferredData.q2_horaInicio}:00` : null,
+        end_time: inferredData.q133_horaFin ? `${inferredData.q133_horaFin}:00` : null,
+        notes: 'Contacto inicial de enrolamiento en programa SEPA',
+        updated_fields: [],
+      })
+      .select('id')
+      .single()
+
+    if (contactError || !contact) throw new Error('Paciente creado sin contacto inicial')
+
+    const { error: motiveError } = await supabase
+      .from('fpc_contact_motives')
+      .insert({
+        contact_id: contact.id,
+        motive_code: 'otro',
+      })
+
+    if (motiveError) throw new Error('Paciente creado sin motivo inicial')
+  }
 
   return {
-    id: String(patient.legacy_id ?? patient.id),
+    id: patientId,
     ...inferredData,
     fechaCreacion: nowIso,
     estado: 'activo',
@@ -227,6 +310,7 @@ export function Step8Cierre() {
     completeEnrollment,
     resetEnrollment,
     isComplete,
+    prospectoId,
   } = useEnrollmentStore()
   const partial = formData as Partial<EnrollmentFormData>
   const user = useAuthStore((s) => s.user)
@@ -255,6 +339,7 @@ export function Step8Cierre() {
     mutation.mutate({
       data: { ...partial, ...values },
       agenteId: String(user?.id ?? 'system-enrollment'),
+      prospectoId,
     })
   }
 

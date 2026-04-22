@@ -1,10 +1,12 @@
 import { cn } from "@/lib/utils"
 import type { AsideContent } from "../_utils/aside-resolver"
-import { Info, AlertTriangle, BookOpen } from "lucide-react"
+import { Info, AlertTriangle, BookOpen, RotateCcw } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface EnrollmentAsideProps {
   content: AsideContent
   currentStep: number
+  onReset?: () => void
 }
 
 const VARIANT_CONFIG = {
@@ -47,36 +49,65 @@ function AsideCard({
   )
 }
 
-export function EnrollmentAside({ content }: EnrollmentAsideProps) {
+export function EnrollmentAside({ content, onReset }: EnrollmentAsideProps) {
   const hasContent = content.script || content.complianceNote
 
   if (!hasContent) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <BookOpen className="mx-auto mb-2 size-8 text-muted-foreground/30" />
-          <p className="text-xs text-muted-foreground">El guión aparecerá aquí</p>
+      <div className="flex h-full flex-col">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <BookOpen className="mx-auto mb-2 size-8 text-muted-foreground/30" />
+            <p className="text-xs text-muted-foreground">El guión aparecerá aquí</p>
+          </div>
         </div>
+        {onReset && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-1.5 mt-4"
+            onClick={onReset}
+          >
+            <RotateCcw className="size-3.5" />
+            Reiniciar formulario
+          </Button>
+        )}
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-3 pb-4">
-      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Guión del Agente
-      </p>
+    <div className="flex flex-col gap-3 pb-4 h-full">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Guión del Agente
+        </p>
+      </div>
 
-      {content.script && (
-        <AsideCard title="Guión" text={content.script} variant="script" />
-      )}
+      <div className="flex-1 space-y-3">
+        {content.script && (
+          <AsideCard title="Guión" text={content.script} variant="script" />
+        )}
 
-      {content.complianceNote && (
-        <AsideCard title="Nota de cumplimiento" text={content.complianceNote} variant="warning" />
-      )}
+        {content.complianceNote && (
+          <AsideCard title="Nota de cumplimiento" text={content.complianceNote} variant="warning" />
+        )}
 
-      {content.reference && (
-        <p className="mt-1 px-1 text-[10px] text-muted-foreground/50">{content.reference}</p>
+        {content.reference && (
+          <p className="mt-1 px-1 text-[10px] text-muted-foreground/50">{content.reference}</p>
+        )}
+      </div>
+
+      {onReset && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-1.5 mt-2"
+          onClick={onReset}
+        >
+          <RotateCcw className="size-3.5" />
+          Reiniciar formulario
+        </Button>
       )}
     </div>
   )

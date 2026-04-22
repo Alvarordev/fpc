@@ -2,10 +2,18 @@
 
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Building2, Plus, Search, TriangleAlert, Users } from "lucide-react"
+import { Building2, Plus, Search, TriangleAlert, Users, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
   Select,
   SelectContent,
@@ -17,7 +25,33 @@ import { useHospitals, useCreateHospital, useHospitalAlerts } from "@/hooks/use-
 import { usePatients } from "@/hooks/use-patients"
 import { cn } from "@/lib/utils"
 
-const CITIES = ["Lima", "Arequipa", "Cusco", "Trujillo", "Piura", "Chiclayo", "Iquitos", "Otros"]
+const DEPARTAMENTOS_PERU = [
+  "Amazonas",
+  "Áncash",
+  "Apurímac",
+  "Arequipa",
+  "Ayacucho",
+  "Cajamarca",
+  "Callao",
+  "Cusco",
+  "Huancavelica",
+  "Huánuco",
+  "Ica",
+  "Junín",
+  "La Libertad",
+  "Lambayeque",
+  "Lima",
+  "Loreto",
+  "Madre de Dios",
+  "Moquegua",
+  "Pasco",
+  "Piura",
+  "Puno",
+  "San Martín",
+  "Tacna",
+  "Tumbes",
+  "Ucayali",
+]
 
 export function HospitalsContent() {
   const router = useRouter()
@@ -27,9 +61,9 @@ export function HospitalsContent() {
   const createHospital = useCreateHospital()
 
   const [search, setSearch] = useState("")
-  const [adding, setAdding] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [nombre, setNombre] = useState("")
-  const [ciudad, setCiudad] = useState("")
+  const [departamento, setDepartamento] = useState("")
 
   const patientHospitals = useMemo(() => {
     const map = new Map<string, Set<string>>()
@@ -82,11 +116,20 @@ export function HospitalsContent() {
   }, [hospitals, search])
 
   async function handleAdd() {
-    if (!nombre.trim() || !ciudad) return
-    await createHospital.mutateAsync({ nombre: nombre.trim().toUpperCase(), ciudad })
+    if (!nombre.trim() || !departamento) return
+    await createHospital.mutateAsync({
+      nombre: nombre.trim().toUpperCase(),
+      ciudad: departamento,
+    })
     setNombre("")
-    setCiudad("")
-    setAdding(false)
+    setDepartamento("")
+    setDialogOpen(false)
+  }
+
+  function handleCancel() {
+    setNombre("")
+    setDepartamento("")
+    setDialogOpen(false)
   }
 
   return (
@@ -98,67 +141,67 @@ export function HospitalsContent() {
             {hospitals.length} establecimientos registrados
           </p>
         </div>
-        {!adding && (
-          <Button size="sm" className="gap-1.5 shrink-0" onClick={() => setAdding(true)}>
-            <Plus className="size-4" />
-            Nuevo hospital
-          </Button>
-        )}
+        <Button size="sm" className="gap-1.5 shrink-0" onClick={() => setDialogOpen(true)}>
+          <Plus className="size-4" />
+          Nuevo hospital
+        </Button>
       </div>
 
-      {adding && (
-        <div className="rounded-xl border bg-card p-4 space-y-3">
-          <p className="text-sm font-medium">Nuevo establecimiento</p>
-          <div className="grid gap-3 md:grid-cols-2">
+      {/* ── Dialog para crear hospital ── */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md ">
+          <DialogHeader className="pb-8">
+            <DialogTitle>Nuevo establecimiento</DialogTitle>
+            <DialogDescription>
+              Registrá un nuevo hospital o centro de salud en el sistema.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2 px-6">
             <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Nombre</Label>
+              <Label htmlFor="hospital-nombre">Nombre del establecimiento</Label>
               <Input
+                id="hospital-nombre"
                 autoFocus
-                placeholder="Ej: HOSPITAL NACIONAL..."
+                placeholder="Ej: HOSPITAL NACIONAL EDGARDO REBAGLIATI MARTINS"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                className="h-8 text-sm"
               />
             </div>
+
             <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Ciudad</Label>
-              <Select value={ciudad} onValueChange={(v) => v && setCiudad(v)}>
-                <SelectTrigger className="h-8 text-sm w-full">
-                  <SelectValue placeholder="Seleccionar..." />
+              <Label htmlFor="hospital-departamento">Departamento</Label>
+              <Select value={departamento} onValueChange={(v) => v && setDepartamento(v)}>
+                <SelectTrigger id="hospital-departamento" className="w-full">
+                  <SelectValue placeholder="Seleccionar departamento..." />
                 </SelectTrigger>
-                <SelectContent>
-                  {CITIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
+                <SelectContent className="max-h-72">
+                  {DEPARTAMENTOS_PERU.map((dep) => (
+                    <SelectItem key={dep} value={dep}>
+                      <span className="inline-flex items-center gap-2">
+                        <MapPin className="size-3 text-muted-foreground" />
+                        {dep}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleAdd}
-              disabled={!nombre.trim() || !ciudad || createHospital.isPending}
-              className="flex-1"
-            >
-              {createHospital.isPending ? "Agregando..." : "Confirmar"}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setAdding(false)
-                setNombre("")
-                setCiudad("")
-              }}
-            >
+
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancel}>
               Cancelar
             </Button>
-          </div>
-        </div>
-      )}
+            <Button
+              onClick={handleAdd}
+              disabled={!nombre.trim() || !departamento || createHospital.isPending}
+            >
+              {createHospital.isPending ? "Agregando..." : "Guardar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="relative max-w-md">
         <Search className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-muted-foreground" />

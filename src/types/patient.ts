@@ -1,6 +1,6 @@
 import type { EnrollmentFormData } from '@/app/(dashboard)/inscripcion/_types/enrollment-types'
 
-export type PatientStatus = 'activo' | 'inactivo'
+export type PatientStatus = 'activo' | 'inactivo' | 'prospecto'
 
 export interface Patient extends EnrollmentFormData {
   id: string
@@ -80,6 +80,7 @@ export interface Patient extends EnrollmentFormData {
 export const statusLabels: Record<PatientStatus, string> = {
   activo: 'Activo',
   inactivo: 'Inactivo',
+  prospecto: 'Prospecto',
 }
 
 export interface ProfileField {
@@ -259,7 +260,7 @@ export const PROFILE_SECTIONS: ProfileSection[] = [
         key: 'estado',
         label: 'Estado',
         input: 'select',
-        options: ['activo', 'inactivo'],
+        options: ['activo', 'inactivo', 'prospecto'],
       },
       {
         key: 'q27_categoria',

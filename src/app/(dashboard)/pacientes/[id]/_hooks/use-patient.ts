@@ -2,12 +2,12 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
-import type { Patient } from "@/types/patient"
+import type { Patient, PatientStatus } from "@/types/patient"
 
 async function fetchPatient(id: string): Promise<Patient> {
   const { data, error } = await supabase
     .from("fpc_patients")
-    .select("id, legacy_id, enrollment_payload")
+    .select("id, legacy_id, enrollment_payload, status")
     .eq("legacy_id", id)
     .maybeSingle()
 
@@ -16,6 +16,7 @@ async function fetchPatient(id: string): Promise<Patient> {
   return {
     ...(data.enrollment_payload as Patient),
     id: String(data.legacy_id ?? data.id),
+    estado: data.status as Patient['estado'],
   }
 }
 
@@ -37,7 +38,7 @@ async function patchPatient(id: string, data: Partial<Patient>): Promise<Patient
     .from("fpc_patients")
     .update({
       enrollment_payload: nextPayload,
-      status: data.estado === "inactivo" ? "inactivo" : "activo",
+      status: data.estado ?? "activo",
       full_name: typeof data.q9_nombrePaciente === "string" ? data.q9_nombrePaciente : (nextPayload.q9_nombrePaciente as string | undefined),
       dni: typeof data.q10_dni === "string" ? data.q10_dni : (nextPayload.q10_dni as string | undefined),
       patient_number: typeof data.nroPaciente === "string" ? data.nroPaciente : (nextPayload.nroPaciente as string | undefined),
@@ -76,6 +77,112 @@ export function useUpdatePatient(id: string) {
     mutationFn: (data: Partial<Patient>) => patchPatient(id, data),
     onSuccess: (updated) => {
       queryClient.setQueryData(["patients", id], updated)
+    },
+  })
+}
+
+export interface CreateProspectInput {
+  nombre: string
+  telefono: string
+  dni?: string
+  canal: string
+  fecha: string
+  hora: string
+  notas?: string
+  agenteId: string
+}
+
+export function useCreateProspect() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: CreateProspectInput) => {
+      const legacyId = `p-${Date.now()}`
+      const nowIso = new Date().toISOString()
+
+      // 1. Crear paciente prospecto
+      const { data: patient, error: patientError } = await supabase
+        .from("fpc_patients")
+        .insert({
+          legacy_id: legacyId,
+          status: "prospecto" as PatientStatus,
+          full_name: input.nombre,
+          phone: input.telefono,
+          dni: input.dni || null,
+          entry_point: input.canal,
+          enrollment_payload: {
+            id: legacyId,
+            q9_nombrePaciente: input.nombre,
+            q17_telefono: input.telefono,
+            q10_dni: input.dni || "",
+            puntoIngreso: input.canal,
+            fechaCreacion: nowIso,
+            estado: "prospecto",
+          },
+          created_by_user_id: input.agenteId || null,
+        })
+        .select("id, legacy_id")
+        .single()
+
+      if (patientError || !patient) throw new Error("Error al crear prospecto")
+
+      // 2. Crear contacto agendado
+      const contactLegacyId = `scheduled-${Date.now()}`
+      await supabase.from("fpc_contacts").insert({
+        legacy_id: contactLegacyId,
+        patient_id: patient.id,
+        created_by_user_id: input.agenteId || null,
+        assigned_user_id: input.agenteId || null,
+        origin: "seguimiento",
+        direction: "saliente",
+        status: "agendado",
+        contact_date: input.fecha,
+        start_time: input.hora ? `${input.hora}:00` : null,
+        notes: input.notas || "Contacto de seguimiento agendado",
+      })
+
+      return { patientId: String(patient.legacy_id ?? patient.id), contactId: contactLegacyId }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patients"] })
+      queryClient.invalidateQueries({ queryKey: ["callcenterContacts"] })
+    },
+  })
+}
+
+export function useDeleteProspect() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (legacyId: string) => {
+      // 1. Buscar el paciente por legacy_id
+      const { data: patient, error: findError } = await supabase
+        .from("fpc_patients")
+        .select("id")
+        .eq("legacy_id", legacyId)
+        .single()
+
+      if (findError || !patient) throw new Error("Prospecto no encontrado")
+
+      // 2. Borrar primero los contactos (FK con RESTRICT, no CASCADE)
+      const { error: contactsError } = await supabase
+        .from("fpc_contacts")
+        .delete()
+        .eq("patient_id", patient.id)
+
+      if (contactsError) throw new Error("Error al eliminar contactos del prospecto")
+
+      // 3. Borrar el paciente
+      const { error: deleteError } = await supabase
+        .from("fpc_patients")
+        .delete()
+        .eq("id", patient.id)
+
+      if (deleteError) throw new Error("Error al eliminar prospecto")
+
+      return legacyId
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patients"] })
+      queryClient.invalidateQueries({ queryKey: ["callcenterContacts"] })
     },
   })
 }

@@ -1,7 +1,7 @@
 export interface PsicoSession {
   id: string
   pacienteId: string
-  voluntarioId: number
+  voluntarioId: string
   availabilitySlotId?: string
   sesionNumero: number
   fecha: string

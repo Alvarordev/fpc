@@ -54,10 +54,10 @@ export function CalendarDayCell({
       </span>
 
       {slots.map((slot) => {
-        const volunteer = volunteers.find((v) => String(v.id) === String(slot.voluntarioId))
+        const volunteer = volunteers.find((v) => v.id === slot.voluntarioId)
         if (!volunteer) return null
 
-        const isHighlighted = highlightedIds.length === 0 || highlightedIds.includes(String(slot.voluntarioId))
+        const isHighlighted = highlightedIds.length === 0 || highlightedIds.includes(slot.voluntarioId)
         const color = getVolunteerColor(slot.voluntarioId)
         const initials = `${volunteer.nombre[0]}${volunteer.apellido[0]}`
 

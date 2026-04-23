@@ -165,7 +165,7 @@ export function NewContactContent({ pacienteId, contactId }: NewContactContentPr
 
   const activeVolunteers = volunteers.filter((v) => v.estado === "activo")
   const slotsForVolunteer = availableSlots
-    .filter((s) => String(s.voluntarioId) === selectedVolunteer)
+    .filter((s) => s.voluntarioId === selectedVolunteer)
     .sort((a, b) => a.fecha.localeCompare(b.fecha))
 
   /* ── Schedule form ── */
@@ -313,13 +313,13 @@ export function NewContactContent({ pacienteId, contactId }: NewContactContentPr
 
     // Psico session
     if (psicoDraft) {
-      const slot = availableSlots.find((s) => String(s.id) === psicoDraft.slotId)
+      const slot = availableSlots.find((s) => s.id === psicoDraft.slotId)
       if (slot) {
         await createSession.mutateAsync({
           session: {
             id: `ps${Date.now()}`,
             pacienteId,
-            voluntarioId: Number(psicoDraft.voluntarioId),
+            voluntarioId: psicoDraft.voluntarioId,
             availabilitySlotId: psicoDraft.slotId,
             sesionNumero: existingSessions.length + 1,
             fecha: slot.fecha,
@@ -672,7 +672,7 @@ export function NewContactContent({ pacienteId, contactId }: NewContactContentPr
                     </SelectTrigger>
                     <SelectContent>
                       {slotsForVolunteer.map((slot) => (
-                        <SelectItem key={String(slot.id)} value={String(slot.id)}>
+                        <SelectItem key={slot.id} value={slot.id}>
                           {formatSlot(slot)}
                         </SelectItem>
                       ))}

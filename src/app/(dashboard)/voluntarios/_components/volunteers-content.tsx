@@ -18,7 +18,7 @@ type VolunteerStatus = Volunteer["estado"]
 interface SlotRow {
   id: string
   legacy_id: string | null
-  volunteer?: { legacy_id?: number | string | null } | null
+  volunteer_id: string
   slot_date: string
   start_time: string
   end_time: string
@@ -30,12 +30,12 @@ const NOW = new Date()
 async function fetchVolunteers(): Promise<Volunteer[]> {
   const { data, error } = await supabase
     .from("fpc_volunteers")
-    .select("id, legacy_id, nombre, apellido, email, telefono, estado, especialidad")
+    .select("id, nombre, apellido, email, telefono, estado, especialidad")
 
   if (error) throw new Error("Error al cargar voluntarios")
 
   return (data ?? []).map((row) => ({
-    id: Number(row.legacy_id ?? 0),
+    id: row.id,
     nombre: row.nombre,
     apellido: row.apellido,
     email: row.email,
@@ -48,13 +48,13 @@ async function fetchVolunteers(): Promise<Volunteer[]> {
 async function fetchSlots(): Promise<AvailabilitySlot[]> {
   const { data, error } = await supabase
     .from("fpc_availability_slots")
-    .select("id, legacy_id, volunteer:fpc_volunteers!fpc_availability_slots_volunteer_id_fkey(legacy_id), slot_date, start_time, end_time, status")
+    .select("id, legacy_id, volunteer_id, slot_date, start_time, end_time, status")
 
   if (error) throw new Error("Error al cargar disponibilidad")
 
   return ((data ?? []) as SlotRow[]).map((row) => ({
     id: String(row.legacy_id ?? row.id),
-    voluntarioId: Number(row.volunteer?.legacy_id ?? 0),
+    voluntarioId: row.volunteer_id,
     fecha: row.slot_date,
     horaInicio: row.start_time?.slice(0, 5) ?? "",
     horaFin: row.end_time?.slice(0, 5) ?? "",

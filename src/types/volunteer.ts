@@ -1,5 +1,5 @@
 export interface Volunteer {
-  id: number
+  id: string
   nombre: string
   apellido: string
   email: string
@@ -10,7 +10,7 @@ export interface Volunteer {
 
 export interface AvailabilitySlot {
   id: string
-  voluntarioId: number
+  voluntarioId: string
   fecha: string
   horaInicio: string
   horaFin: string

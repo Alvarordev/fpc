@@ -7,7 +7,7 @@ import type { AvailabilitySlot } from "@/types/volunteer"
 interface SlotRow {
   id: string
   legacy_id: string | null
-  volunteer?: { legacy_id?: number | string | null } | null
+  volunteer_id: string
   slot_date: string
   start_time: string
   end_time: string
@@ -15,24 +15,16 @@ interface SlotRow {
 }
 
 async function fetchMySlots(voluntarioId: string): Promise<AvailabilitySlot[]> {
-  const { data: volunteer, error: volunteerError } = await supabase
-    .from("fpc_volunteers")
-    .select("id")
-    .eq("id", voluntarioId)
-    .maybeSingle()
-
-  if (volunteerError || !volunteer) throw new Error("Error al cargar disponibilidad")
-
   const { data, error } = await supabase
     .from("fpc_availability_slots")
-    .select("id, legacy_id, volunteer:fpc_volunteers!fpc_availability_slots_volunteer_id_fkey(legacy_id), slot_date, start_time, end_time, status")
-    .eq("volunteer_id", volunteer.id)
+    .select("id, legacy_id, volunteer_id, slot_date, start_time, end_time, status")
+    .eq("volunteer_id", voluntarioId)
 
   if (error) throw new Error("Error al cargar disponibilidad")
 
   return ((data ?? []) as SlotRow[]).map((row) => ({
     id: String(row.legacy_id ?? row.id),
-    voluntarioId: Number(row.volunteer?.legacy_id ?? 0),
+    voluntarioId: row.volunteer_id,
     fecha: row.slot_date,
     horaInicio: row.start_time?.slice(0, 5) ?? "",
     horaFin: row.end_time?.slice(0, 5) ?? "",
@@ -75,7 +67,7 @@ async function postSlot(
   if (error || !data) throw new Error("Error al crear disponibilidad")
 
   return {
-    voluntarioId: 0,
+    voluntarioId: volunteerId,
     ...payload,
     id: String(data.legacy_id ?? data.id),
   }
@@ -104,7 +96,7 @@ async function postBulkSlots(
   if (error || !data) throw new Error("Error al crear disponibilidades")
 
   return slots.map((s, i) => ({
-    voluntarioId: 0,
+    voluntarioId: volunteerId,
     ...s,
     estado: "disponible" as const,
     id: String(data[i]?.legacy_id ?? data[i]?.id ?? `${Date.now()}-${i}`),
@@ -115,7 +107,7 @@ async function deleteSlot(id: string): Promise<void> {
   const { error } = await supabase
     .from("fpc_availability_slots")
     .delete()
-    .eq("legacy_id", id)
+    .or(`legacy_id.eq.${id},id.eq.${id}`)
   if (error) throw new Error("Error al eliminar disponibilidad")
 }
 

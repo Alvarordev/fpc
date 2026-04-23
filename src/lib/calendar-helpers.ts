@@ -11,11 +11,18 @@ const VOLUNTEER_COLORS = [
   { bg: "bg-orange-500", light: "bg-orange-100 text-orange-700 border-orange-200" },
 ]
 
-export function getVolunteerColor(voluntarioId: number) {
-  if (!Number.isFinite(voluntarioId) || voluntarioId <= 0) {
-    return VOLUNTEER_COLORS[0]
+function hashString(str: string): number {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i)
+    hash |= 0
   }
-  return VOLUNTEER_COLORS[(voluntarioId - 1) % VOLUNTEER_COLORS.length]
+  return Math.abs(hash)
+}
+
+export function getVolunteerColor(voluntarioId: string) {
+  if (!voluntarioId) return VOLUNTEER_COLORS[0]
+  return VOLUNTEER_COLORS[hashString(voluntarioId) % VOLUNTEER_COLORS.length]
 }
 
 export function getDaysInMonth(year: number, month: number): Date[] {

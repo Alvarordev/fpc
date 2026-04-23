@@ -67,7 +67,7 @@ export function getVolunteerColumns(slots: AvailabilitySlot[]): ColumnDef<Volunt
       header: "Slots disponibles",
       cell: ({ row }) => {
         const count = slots.filter(
-          (s) => String(s.voluntarioId) === String(row.original.id) && s.estado === "disponible"
+          (s) => s.voluntarioId === row.original.id && s.estado === "disponible"
         ).length
         return <span className="text-sm font-medium text-foreground">{count}</span>
       },

@@ -40,7 +40,7 @@ export function PsicoTab({ pacienteId }: PsicoTabProps) {
 
   const showCreateButton = canManage && canCreateMore
 
-  function getVolunteerName(voluntarioId: number): string {
+  function getVolunteerName(voluntarioId: string): string {
     const v = volunteers.find((vol) => vol.id === voluntarioId)
     return v ? `${v.nombre} ${v.apellido}` : "Voluntario"
   }

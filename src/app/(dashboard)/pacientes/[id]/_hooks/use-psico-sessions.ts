@@ -8,9 +8,9 @@ import type { Volunteer, AvailabilitySlot } from "@/types/volunteer"
 interface SessionRow {
   id: string
   legacy_id: string | null
-  patient?: { legacy_id?: string | null } | null
-  volunteer?: { legacy_id?: number | string | null } | null
-  availability_slot?: { legacy_id?: string | null } | null
+  patient_id: string
+  volunteer_id: string
+  availability_slot_id: string
   session_number: number
   session_date: string
   start_time: string
@@ -25,7 +25,7 @@ interface SessionRow {
 interface SlotRow {
   id: string
   legacy_id: string | null
-  volunteer?: { legacy_id?: number | string | null } | null
+  volunteer_id: string
   slot_date: string
   start_time: string
   end_time: string
@@ -46,7 +46,7 @@ async function fetchSessions(pacienteId: string): Promise<PsicoSession[]> {
   // 2. Filtramos sesiones por patient_id (FK directa, evita dot-notation bug en Supabase)
   const { data, error } = await supabase
     .from("fpc_psico_sessions")
-    .select("id, legacy_id, patient:fpc_patients!fpc_psico_sessions_patient_id_fkey(legacy_id), volunteer:fpc_volunteers!fpc_psico_sessions_volunteer_id_fkey(legacy_id), availability_slot:fpc_availability_slots!fpc_psico_sessions_availability_slot_id_fkey(legacy_id), session_number, session_date, start_time, end_time, mode, status, notes, satisfaction, extra_needed")
+    .select("id, legacy_id, patient_id, volunteer_id, availability_slot_id, session_number, session_date, start_time, end_time, mode, status, notes, satisfaction, extra_needed")
     .eq("patient_id", patientRow.id)
 
   if (error) throw new Error("Error al cargar sesiones")
@@ -54,8 +54,8 @@ async function fetchSessions(pacienteId: string): Promise<PsicoSession[]> {
   return ((data ?? []) as SessionRow[]).map((row) => ({
     id: String(row.legacy_id ?? row.id),
     pacienteId,
-    voluntarioId: Number(row.volunteer?.legacy_id ?? 0),
-    availabilitySlotId: row.availability_slot?.legacy_id ? String(row.availability_slot.legacy_id) : undefined,
+    voluntarioId: row.volunteer_id,
+    availabilitySlotId: row.availability_slot_id,
     sesionNumero: Number(row.session_number ?? 1),
     fecha: row.session_date,
     horaInicio: row.start_time?.slice(0, 5) ?? "",
@@ -71,12 +71,12 @@ async function fetchSessions(pacienteId: string): Promise<PsicoSession[]> {
 async function fetchVolunteers(): Promise<Volunteer[]> {
   const { data, error } = await supabase
     .from("fpc_volunteers")
-    .select("id, legacy_id, nombre, apellido, email, telefono, estado, especialidad")
+    .select("id, nombre, apellido, email, telefono, estado, especialidad")
 
   if (error) throw new Error("Error al cargar voluntarios")
 
   return (data ?? []).map((row) => ({
-    id: Number(row.legacy_id ?? 0),
+    id: row.id,
     nombre: row.nombre,
     apellido: row.apellido,
     email: row.email,
@@ -89,14 +89,14 @@ async function fetchVolunteers(): Promise<Volunteer[]> {
 async function fetchAvailableSlots(): Promise<AvailabilitySlot[]> {
   const { data, error } = await supabase
     .from("fpc_availability_slots")
-    .select("id, legacy_id, volunteer:fpc_volunteers!fpc_availability_slots_volunteer_id_fkey(legacy_id), slot_date, start_time, end_time, status")
+    .select("id, legacy_id, volunteer_id, slot_date, start_time, end_time, status")
     .eq("status", "disponible")
 
   if (error) throw new Error("Error al cargar horarios")
 
   return ((data ?? []) as SlotRow[]).map((row) => ({
     id: String(row.legacy_id ?? row.id),
-    voluntarioId: Number(row.volunteer?.legacy_id ?? 0),
+    voluntarioId: row.volunteer_id,
     fecha: row.slot_date,
     horaInicio: row.start_time?.slice(0, 5) ?? "",
     horaFin: row.end_time?.slice(0, 5) ?? "",
@@ -142,16 +142,9 @@ export function useCreatePsicoSession(pacienteId: string) {
         .single()
       if (patientError || !patient) throw new Error("Paciente no encontrado")
 
-      const { data: volunteer, error: volunteerError } = await supabase
-        .from("fpc_volunteers")
-        .select("id")
-        .eq("legacy_id", session.voluntarioId)
-        .single()
-      if (volunteerError || !volunteer) throw new Error("Voluntario no encontrado")
-
       const { data: slot, error: slotError } = await supabase
         .from("fpc_availability_slots")
-        .select("id")
+        .select("id, legacy_id")
         .eq("legacy_id", slotId)
         .single()
       if (slotError || !slot) throw new Error("Horario no encontrado")
@@ -161,7 +154,7 @@ export function useCreatePsicoSession(pacienteId: string) {
         .insert({
           legacy_id: session.id,
           patient_id: patient.id,
-          volunteer_id: volunteer.id,
+          volunteer_id: session.voluntarioId,
           availability_slot_id: slot.id,
           session_number: session.sesionNumero,
           session_date: session.fecha,
@@ -213,7 +206,7 @@ export function useUpdatePsicoSession(pacienteId: string) {
       return {
         id,
         pacienteId,
-        voluntarioId: data.voluntarioId ?? 0,
+        voluntarioId: data.voluntarioId ?? '',
         availabilitySlotId: data.availabilitySlotId,
         sesionNumero: data.sesionNumero ?? 1,
         fecha: data.fecha ?? "",

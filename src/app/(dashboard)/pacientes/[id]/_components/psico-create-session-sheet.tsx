@@ -68,11 +68,11 @@ export function PsicoCreateSessionSheet({
 
   const activeVolunteers = volunteers.filter((v) => v.estado === "activo")
   const slotsForVolunteer = availableSlots.filter(
-    (s) => String(s.voluntarioId) === selectedVoluntarioId
+    (s) => s.voluntarioId === selectedVoluntarioId
   )
 
   async function onSubmit(values: FormValues) {
-    const slot = availableSlots.find((s) => String(s.id) === values.slotId)
+    const slot = availableSlots.find((s) => s.id === values.slotId)
     if (!slot) return
 
     const sesionNumero = existingSessions.length + 1
@@ -80,7 +80,7 @@ export function PsicoCreateSessionSheet({
     const newSession: PsicoSession & { id: string } = {
       id: `ps${Date.now()}`,
       pacienteId,
-      voluntarioId: Number(values.voluntarioId),
+      voluntarioId: values.voluntarioId,
       availabilitySlotId: values.slotId,
       sesionNumero,
       fecha: slot.fecha,
@@ -122,7 +122,7 @@ export function PsicoCreateSessionSheet({
                     </SelectTrigger>
                     <SelectContent>
                       {activeVolunteers.map((v) => (
-                        <SelectItem key={String(v.id)} value={String(v.id)}>
+                        <SelectItem key={v.id} value={v.id}>
                           {v.nombre} {v.apellido} — {v.especialidad}
                         </SelectItem>
                       ))}
@@ -161,7 +161,7 @@ export function PsicoCreateSessionSheet({
                       {slotsForVolunteer
                         .sort((a, b) => a.fecha.localeCompare(b.fecha))
                         .map((slot) => (
-                          <SelectItem key={String(slot.id)} value={String(slot.id)}>
+                          <SelectItem key={slot.id} value={slot.id}>
                             {formatSlot(slot)}
                           </SelectItem>
                         ))}

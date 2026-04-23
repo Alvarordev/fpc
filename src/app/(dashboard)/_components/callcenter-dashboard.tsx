@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   AlertTriangle,
@@ -16,7 +15,6 @@ import {
   UserRound,
   Users,
   MessageCircle,
-  Headphones,
   Share2,
   Globe,
   Hash,
@@ -44,7 +42,7 @@ import {
 } from "@/components/ui/select"
 import { useCallcenterContacts } from "@/app/(dashboard)/llamadas/_hooks/use-callcenter-contacts"
 import { useHospitalAlerts } from "@/hooks/use-hospitals"
-import { useCreateProspect } from "@/app/(dashboard)/pacientes/[id]/_hooks/use-patient"
+import { useCreateProspectoApi } from "@/hooks/use-create-prospecto"
 import { useAuthStore } from "@/store/auth-store"
 import { cn } from "@/lib/utils"
 
@@ -62,14 +60,6 @@ function formatDate(date: string): string {
   })
 }
 
-function daysFromToday(date: string): number {
-  const TODAY = new Date().toISOString().slice(0, 10)
-  const today = new Date(TODAY)
-  const target = new Date(`${date}T12:00:00`)
-  const diff = target.getTime() - today.getTime()
-  return Math.ceil(diff / (1000 * 60 * 60 * 24))
-}
-
 const TODAY = new Date().toISOString().slice(0, 10)
 
 const CANALES = [
@@ -85,12 +75,15 @@ export function CallcenterDashboard() {
   const user = useAuthStore((s) => s.user)
   const { data: contacts = [], isLoading } = useCallcenterContacts()
   const { data: alerts = [] } = useHospitalAlerts()
-  const createProspect = useCreateProspect()
+  const createProspect = useCreateProspectoApi()
 
   const [prospectDialogOpen, setProspectDialogOpen] = useState(false)
   const [nombre, setNombre] = useState("")
-  const [telefono, setTelefono] = useState("")
+  const [celular, setCelular] = useState("")
   const [dni, setDni] = useState("")
+  const [correo, setCorreo] = useState("")
+  const [diagnostico, setDiagnostico] = useState("")
+  const [esPaciente, setEsPaciente] = useState(true)
   const [canal, setCanal] = useState("")
   const [fecha, setFecha] = useState(TODAY)
   const [hora, setHora] = useState("")
@@ -109,11 +102,14 @@ export function CallcenterDashboard() {
   const upcoming = scheduledContacts.filter((c) => c.fecha > TODAY)
 
   async function handleCreateProspect() {
-    if (!nombre.trim() || !telefono.trim() || !canal || !fecha || !hora) return
+    if (!nombre.trim() || !celular.trim() || !canal || !fecha || !hora) return
     await createProspect.mutateAsync({
       nombre: nombre.trim(),
-      telefono: telefono.trim(),
+      celular: celular.trim(),
       dni: dni.trim() || undefined,
+      correo: correo.trim() || undefined,
+      diagnostico: diagnostico.trim() || undefined,
+      esPaciente,
       canal,
       fecha,
       hora,
@@ -126,8 +122,11 @@ export function CallcenterDashboard() {
 
   function resetProspectForm() {
     setNombre("")
-    setTelefono("")
+    setCelular("")
     setDni("")
+    setCorreo("")
+    setDiagnostico("")
+    setEsPaciente(true)
     setCanal("")
     setFecha(TODAY)
     setHora("")
@@ -179,12 +178,12 @@ export function CallcenterDashboard() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="prospect-telefono">Teléfono *</Label>
+                <Label htmlFor="prospect-celular">Celular *</Label>
                 <Input
-                  id="prospect-telefono"
+                  id="prospect-celular"
                   placeholder="Ej: 987654321"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
+                  value={celular}
+                  onChange={(e) => setCelular(e.target.value)}
                 />
               </div>
             </div>
@@ -200,6 +199,30 @@ export function CallcenterDashboard() {
                 />
               </div>
               <div className="space-y-1.5">
+                <Label htmlFor="prospect-correo">Correo electrónico</Label>
+                <Input
+                  id="prospect-correo"
+                  type="email"
+                  placeholder="ejemplo@correo.com"
+                  value={correo}
+                  onChange={(e) => setCorreo(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="prospect-diagnostico">Diagnóstico / Nota</Label>
+              <Textarea
+                id="prospect-diagnostico"
+                placeholder="Breve descripción del diagnóstico o motivo de contacto..."
+                value={diagnostico}
+                onChange={(e) => setDiagnostico(e.target.value)}
+                className="min-h-16 resize-none"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
                 <Label htmlFor="prospect-canal">Canal de ingreso *</Label>
                 <Select value={canal} onValueChange={(v) => v && setCanal(v)}>
                   <SelectTrigger id="prospect-canal">
@@ -214,6 +237,21 @@ export function CallcenterDashboard() {
                         </span>
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="prospect-es-paciente">¿Es paciente oncológico? *</Label>
+                <Select
+                  value={esPaciente ? "si" : "no"}
+                  onValueChange={(v) => setEsPaciente(v === "si")}
+                >
+                  <SelectTrigger id="prospect-es-paciente">
+                    <SelectValue placeholder="Seleccionar..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="si">Sí</SelectItem>
+                    <SelectItem value="no">No</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -241,13 +279,13 @@ export function CallcenterDashboard() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="prospect-notas">Notas</Label>
+              <Label htmlFor="prospect-notas">Notas adicionales</Label>
               <Textarea
                 id="prospect-notas"
                 placeholder="Observaciones sobre el contacto..."
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
-                className="min-h-20 resize-none"
+                className="min-h-16 resize-none"
               />
             </div>
           </div>
@@ -260,7 +298,7 @@ export function CallcenterDashboard() {
               onClick={handleCreateProspect}
               disabled={
                 !nombre.trim() ||
-                !telefono.trim() ||
+                !celular.trim() ||
                 !canal ||
                 !fecha ||
                 !hora ||
@@ -444,18 +482,7 @@ interface ContactCardProps {
 
 function ContactCard({ contact, variant, onClick }: ContactCardProps) {
   const isToday = variant === "today"
-  const daysAway = daysFromToday(contact.fecha)
   const isProspect = contact.patientStatus === "prospecto"
-
-  const canalMap: Record<string, string> = {
-    "WhatsApp": "WhatsApp",
-    "Llamada directa": "Llamada",
-    "Referido por paciente": "Referido",
-    "Redes sociales FPC": "Redes sociales",
-    "Otro": "Otro",
-  }
-
-  const canalLabel = canalMap[contact.patientDni] || "Seguimiento"
 
   return (
     <button
